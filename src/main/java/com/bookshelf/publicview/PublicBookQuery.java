@@ -11,6 +11,7 @@ import java.util.Optional;
 /**
  * 공개 책 페이지. book 행이 없으면 없음이다 — 제공자를 부르지 않는다.
  * 부르면 ISBN을 하나씩 올려가며 요청하는 것만으로 우리 예산이 바닥난다 (설계 문서 7-2).
+ * book 행이 있어도 공개된 기록이 없으면 없음이다 (PublicSql.BOOK_IS_LISTED).
  */
 @Component
 public class PublicBookQuery {
@@ -25,9 +26,10 @@ public class PublicBookQuery {
 
     public Optional<PublicBook> find(Isbn13 isbn) {
         return jdbc.sql("""
-                        SELECT isbn13, title, author, publisher, pub_date, cover_url, page_count
-                        FROM book WHERE isbn13 = :isbn
-                        """)
+                        SELECT b.isbn13, b.title, b.author, b.publisher, b.pub_date, b.cover_url, b.page_count
+                        FROM book b
+                        WHERE b.isbn13 = :isbn
+                        """ + " AND " + PublicSql.BOOK_IS_LISTED)   // 텍스트 블록은 줄 끝 공백을 지운다 — 연결 공백은 밖에 둔다
                 .param("isbn", isbn.value())
                 .query((rs, n) -> new PublicBook(
                         rs.getString("isbn13"),

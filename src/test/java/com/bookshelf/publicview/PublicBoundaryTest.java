@@ -30,11 +30,14 @@ class PublicBoundaryTest {
     private static final String B = "9788954651134";
     private static final String C = "9791100000007";
     private static final String NO_BOOK = "9780804429573";   // book 행이 없는 ISBN
+    private static final String CLOSED_ONLY = "9791161571188"; // 닫힌 서재에만 PUBLIC으로 있는 책
+    private static final String GONE_ONLY = "9791168473690";   // 탈퇴한 회원에게만 있는 책
 
     @Autowired JdbcClient jdbc;
     @Autowired Fixtures fx;
     @Autowired PublicShelfQuery shelves;
     @Autowired PublicBookQuery bookPages;
+    @Autowired SitemapQuery sitemap;
 
     @BeforeEach
     void setUp() {
@@ -42,6 +45,9 @@ class PublicBoundaryTest {
         fx.book(A, "소년이 온다");
         fx.book(B, "소년을 위로해줘");
         fx.book(C, "독립출판");
+        // 백필은 공개 여부와 상관없이 모든 기록의 책을 채운다 — book 행이 있다는 것 자체가 기록의 흔적이다
+        fx.book(CLOSED_ONLY, "닫힌 서재의 책");
+        fx.book(GONE_ONLY, "탈퇴한 회원의 책");
 
         Member open = fx.member("open", true);
         fx.record(open, A, PUBLIC, 5, "공개한 한줄평");
@@ -55,9 +61,11 @@ class PublicBoundaryTest {
 
         Member closed = fx.member("secret-closed", false);
         fx.record(closed, A, PUBLIC, 3, "SECRET_닫힌_서재의_한줄평");
+        fx.record(closed, CLOSED_ONLY, PUBLIC, 3, null);
 
         Member gone = fx.withdraw(fx.member("secret-gone", true));
         fx.record(gone, A, PUBLIC, 2, "SECRET_탈퇴한_회원의_한줄평");
+        fx.record(gone, GONE_ONLY, PUBLIC, 2, null);
     }
 
     @Test
@@ -123,9 +131,22 @@ class PublicBoundaryTest {
     }
 
     @Test
-    void RATING_ONLY와_PRIVATE는_책_페이지에_실리지_않는다() {
+    void RATING_ONLY는_책_페이지가_있되_한줄평은_실리지_않는다() {
         assertThat(bookPages.find(Isbn13.parse(B)).orElseThrow().reviews()).isEmpty();
-        assertThat(bookPages.find(Isbn13.parse(C)).orElseThrow().reviews()).isEmpty();
+    }
+
+    /**
+     * 책 페이지와 사이트맵 항목이 있다는 것 자체가 "누군가 이 책을 기록했다"를 알린다.
+     * 공개 서재와 비교하면 비공개로 둔 책이 무엇인지 드러난다(설계 문서 7-3: PRIVATE는 읽었다는 사실조차 숨긴다).
+     */
+    @Test
+    void 공개된_기록이_없는_책은_책_페이지도_사이트맵_항목도_없다() {
+        assertThat(bookPages.find(Isbn13.parse(C))).isEmpty();             // PRIVATE로만 기록됨
+        assertThat(bookPages.find(Isbn13.parse(CLOSED_ONLY))).isEmpty();   // 닫힌 서재에만
+        assertThat(bookPages.find(Isbn13.parse(GONE_ONLY))).isEmpty();     // 탈퇴한 회원에게만
+
+        assertThat(sitemap.bookIsbns()).containsExactlyInAnyOrder(A, B);
+        assertThat(sitemap.publicSlugs()).containsExactlyInAnyOrder("open", "secret-rater");
     }
 
     @Test
@@ -137,7 +158,7 @@ class PublicBoundaryTest {
     void 어떤_공개_출력에도_비밀_문자열이_없다() {
         List<Object> everything = Stream.<Object>concat(
                 Stream.of("open", "secret-rater", "secret-closed", "secret-gone", "nobody").map(shelves::find),
-                Stream.of(A, B, C, NO_BOOK).map(Isbn13::parse).map(bookPages::find)
+                Stream.of(A, B, C, NO_BOOK, CLOSED_ONLY, GONE_ONLY).map(Isbn13::parse).map(bookPages::find)
         ).toList();
 
         // record의 toString은 모든 필드를 출력한다 — 필드 하나라도 새면 여기 걸린다.
@@ -145,6 +166,7 @@ class PublicBoundaryTest {
         String out = bookPagesOnly(everything);
         assertThat(everything.toString()).doesNotContain("SECRET_");
         assertThat(out).doesNotContain("secret-");
+        assertThat(sitemap.bookIsbns()).doesNotContain(C, CLOSED_ONLY, GONE_ONLY);
     }
 
     private static String bookPagesOnly(List<Object> everything) {

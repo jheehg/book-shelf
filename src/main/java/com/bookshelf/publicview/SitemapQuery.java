@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-/** 사이트맵도 공개 조회다. 서재 조건은 PublicShelfQuery와 같다 */
+/** 사이트맵도 공개 조회다. 서재 조건은 PublicShelfQuery와, 책 조건은 PublicBookQuery와 같다 */
 @Component
 public class SitemapQuery {
 
@@ -31,7 +31,7 @@ public class SitemapQuery {
     }
 
     public List<String> bookIsbns() {
-        return jdbc.sql("SELECT isbn13 FROM book ORDER BY isbn13 LIMIT :n")
+        return jdbc.sql("SELECT b.isbn13 FROM book b WHERE " + PublicSql.BOOK_IS_LISTED + " ORDER BY b.isbn13 LIMIT :n")
                 .param("n", MAX_BOOKS)
                 .query(String.class)
                 .list();
