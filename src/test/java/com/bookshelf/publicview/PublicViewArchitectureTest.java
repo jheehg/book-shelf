@@ -31,4 +31,10 @@ class PublicViewArchitectureTest {
             .that().resideInAPackage("..publicview..")
             .should().dependOnClassesThat().resideInAnyPackage("..catalog..", "..provider..")
             .because("공개 페이지는 어떤 제공자도 동기로 부르지 않는다 (설계 2-1). 판매 칸은 SaleService의 캐시만 본다");
+
+    @ArchTest
+    static final ArchRule 공개_조회는_도서관_코드를_쓰지_않는다 = noClasses()
+            .that().resideInAPackage("..publicview..")
+            .should().dependOnClassesThat().resideInAnyPackage("..library..")
+            .because("누가 어느 도서관을 등록했는지는 사는 동네를 알려준다 (설계 7-3)");
 }

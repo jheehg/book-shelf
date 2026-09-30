@@ -11,7 +11,7 @@ public final class DbCleaner {
     public static void clean(JdbcClient jdbc) {
         jdbc.sql("""
                 TRUNCATE member, reading_record, book, sale_snapshot, book_lookup_failure,
-                         refresh_request, search_cache, provider_call_counter, refresh_token, user_call_counter, library, library_sync_run
+                         refresh_request, search_cache, provider_call_counter, refresh_token, user_call_counter, library, library_sync_run, member_library, member_library_change, library_holding
                 RESTART IDENTITY
                 """).update();
     }

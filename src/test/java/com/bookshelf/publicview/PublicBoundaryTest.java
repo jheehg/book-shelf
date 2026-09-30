@@ -169,6 +169,17 @@ class PublicBoundaryTest {
         assertThat(sitemap.bookIsbns()).doesNotContain(C, CLOSED_ONLY, GONE_ONLY);
     }
 
+    /** 공개 조회 SQL이 등록 도서관·소장 캐시 테이블을 읽지 않는다. SQL은 모두 publicview 패키지의 소스에 있다 */
+    @Test
+    void 공개_조회_SQL은_도서관_테이블을_읽지_않는다() throws Exception {
+        try (var files = java.nio.file.Files.list(java.nio.file.Path.of("src/main/java/com/bookshelf/publicview"))) {
+            for (var file : files.toList()) {
+                String src = java.nio.file.Files.readString(file);
+                assertThat(src).as(file.toString()).doesNotContain("member_library").doesNotContain("library_holding");
+            }
+        }
+    }
+
     private static String bookPagesOnly(List<Object> everything) {
         return everything.subList(5, everything.size()).toString();
     }

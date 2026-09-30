@@ -4,6 +4,7 @@ import com.bookshelf.auth.ApiAuthenticationEntryPoint;
 import com.bookshelf.auth.UnauthorizedException;
 import com.bookshelf.auth.apple.AppleRejectedException;
 import com.bookshelf.auth.apple.AppleUnavailableException;
+import com.bookshelf.library.application.LibraryChangeLimitException;
 import com.bookshelf.provider.ProviderUnavailableException;
 import com.bookshelf.provider.UserQuotaExceededException;
 import com.bookshelf.search.SearchUnavailableException;
@@ -80,6 +81,13 @@ public class ApiExceptionHandler {
         log.warn("503 {}", e.getMessage());
         return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
                 .body(new ApiError("TRY_LATER", "잠시 후 다시 시도해 주세요"));
+    }
+
+    @ExceptionHandler(LibraryChangeLimitException.class)
+    ResponseEntity<ApiError> tooManyChanges(LibraryChangeLimitException e) {
+        log.debug("429 {}", e.getMessage());
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                .body(new ApiError("TOO_MANY_CHANGES", "도서관은 하루 3번까지 바꿀 수 있어요. 내일 다시 해 주세요"));
     }
 
     @ExceptionHandler(UserQuotaExceededException.class)

@@ -68,6 +68,9 @@ class AccountDeletionTest {
                 VALUES (:m, :isbn, 'DONE', 'PUBLIC', 5, '떠나는 사람의 한줄평', now(), now())
                 """).param("m", memberId).param("isbn", A).update();
         jdbc.sql("INSERT INTO user_call_counter (member_id, day, calls) VALUES (:m, current_date, 3)").param("m", memberId).update();
+        jdbc.sql("INSERT INTO library (lib_code, name, region_code, synced_at) VALUES ('L1', '내 도서관', 11, now())").update();
+        jdbc.sql("INSERT INTO member_library (member_id, lib_code, position) VALUES (:m, 'L1', 1)").param("m", memberId).update();
+        jdbc.sql("INSERT INTO member_library_change (member_id, day, changes) VALUES (:m, current_date, 1)").param("m", memberId).update();
     }
 
     private JsonNode login() throws Exception {
@@ -98,6 +101,9 @@ class AccountDeletionTest {
         assertThat(count("reading_record")).isZero();
         assertThat(count("refresh_token")).isZero();
         assertThat(count("user_call_counter")).isZero();
+        assertThat(count("member_library")).isZero();
+        assertThat(count("member_library_change")).isZero();
+        assertThat(jdbc.sql("SELECT count(*) FROM library").query(Integer.class).single()).isEqualTo(1);   // 도서관 자체는 남는다
         Map<String, Object> row = jdbc.sql("SELECT slug, display_name, apple_sub, shelf_public, deleted_at FROM member WHERE id = :id")
                 .param("id", memberId).query().singleRow();
         assertThat(row.get("slug")).isEqualTo("leaving");

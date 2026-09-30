@@ -15,7 +15,8 @@ import java.time.Instant;
 @Component
 public class MemberDeletion {
 
-    private static final String[] OWNED_TABLES = {"reading_record", "refresh_token", "user_call_counter"};
+    private static final String[] OWNED_TABLES = {"reading_record", "refresh_token", "user_call_counter",
+            "member_library", "member_library_change"};
 
     private final JdbcClient jdbc;
     private final MemberRepository members;
