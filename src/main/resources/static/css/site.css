@@ -1,0 +1,25 @@
+:root { --fg: #1f1f1f; --muted: #6b6b6b; --line: #e5e5e5; --bg: #fff; --placeholder: #d9d9d9; }
+@media (prefers-color-scheme: dark) {
+  :root { --fg: #ececec; --muted: #9a9a9a; --line: #333; --bg: #141414; --placeholder: #3a3a3a; }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg);
+       font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; }
+main { max-width: 720px; margin: 0 auto; padding: 24px 16px; }
+a { color: inherit; }
+.count, .meta, .as-of, .status, .muted, .pending { color: var(--muted); font-size: 14px; }
+.shelf { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 20px; }
+.shelf img, .cover-placeholder { width: 100%; aspect-ratio: 2 / 3; object-fit: cover; border-radius: 4px; background: var(--placeholder); display: block; }
+.shelf .title { display: block; margin-top: 6px; font-size: 14px; text-decoration: none; word-break: break-all; }
+.shelf a { text-decoration: none; }
+.rating { color: #e0a100; }
+.review { margin: 4px 0 0; font-size: 14px; }
+.book-page .cover, .book-page .cover-placeholder { width: 160px; }
+.ways { border-top: 1px solid var(--line); margin: 16px 0; }
+.way { border-bottom: 1px solid var(--line); padding: 12px 0; }
+.way h3 { margin: 0 0 6px; font-size: 15px; }
+.links { list-style: none; padding: 0; margin: 6px 0 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.links a { display: inline-block; padding: 6px 10px; border: 1px solid var(--line); border-radius: 6px; font-size: 14px; text-decoration: none; }
+.reviews ul { list-style: none; padding: 0; }
+.reviews li { border-bottom: 1px solid var(--line); padding: 12px 0; }
+.site-footer { max-width: 720px; margin: 0 auto; padding: 24px 16px; color: var(--muted); font-size: 12px; }

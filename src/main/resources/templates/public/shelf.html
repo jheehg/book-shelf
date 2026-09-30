@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{public/fragments :: head(${pageTitle}, ${pageDescription}, ${pageImage}, ${pageUrl})}"></head>
+<body>
+<main class="shelf-page">
+    <h1 th:text="${pageTitle}">이름의 서재</h1>
+    <p class="count" th:text="${pageDescription}">공개한 책 N권</p>
+    <ul class="shelf">
+        <li th:each="e : ${shelf.entries}" th:with="review=${reviews[e.isbn13]}">
+            <!-- 책 정보가 있으면 책 페이지로. 없으면 링크 없이 회색 칸과 ISBN (설계 문서 7-2) -->
+            <a th:if="${e.title != null}" th:href="@{/book/{isbn}(isbn=${e.isbn13})}">
+                <img th:if="${e.coverUrl != null}" th:src="${e.coverUrl}" th:alt="${e.title}" loading="lazy">
+                <div th:if="${e.coverUrl == null}" class="cover-placeholder"></div>
+                <span class="title" th:text="${e.title}">제목</span>
+            </a>
+            <div th:if="${e.title == null}" class="no-book">
+                <div class="cover-placeholder"></div>
+                <span class="title" th:text="${e.isbn13}">ISBN</span>
+                <span class="pending">책 정보 준비 중</span>
+            </div>
+            <span class="status" th:text="${statusLabels[e.status]}">읽었어요</span>
+            <span class="rating" th:if="${e.rating != null}" th:text="${#strings.repeat('★', e.rating)}">★★★</span>
+            <p class="review" th:if="${review != null}" th:text="${review}">한줄평</p>
+        </li>
+    </ul>
+</main>
+<footer th:replace="~{public/fragments :: footer}"></footer>
+</body>
+</html>

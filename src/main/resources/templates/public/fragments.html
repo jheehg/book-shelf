@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head(title, description, image, url)">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${title}">book-shelf</title>
+    <meta name="description" th:content="${description}">
+    <link rel="canonical" th:href="${url}">
+    <!-- 카톡·검색봇은 자바스크립트를 실행하지 않는다. 이 태그들이 미리보기 카드의 전부다 -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="book-shelf">
+    <meta property="og:title" th:content="${title}">
+    <meta property="og:description" th:content="${description}">
+    <meta property="og:url" th:content="${url}">
+    <meta th:if="${image != null}" property="og:image" th:content="${image}">
+    <meta name="twitter:card" content="summary">
+    <link rel="stylesheet" href="/css/site.css">
+</head>
+<body>
+<footer th:fragment="footer" class="site-footer">
+    <p>도서 정보 제공: 카카오 책 검색</p>
+</footer>
+</body>
+</html>
