@@ -36,6 +36,8 @@ public class Member {
 
     private Instant deletedAt;
 
+    private String appleSub;
+
     public static Member register(String slug, String displayName, Instant now) {
         if (slug == null || !SLUG.matcher(slug).matches()) {
             throw new DomainException("slug 규칙 위반: " + slug);
@@ -50,6 +52,16 @@ public class Member {
         m.shelfPublic = false;
         m.defaultVisibility = Visibility.PRIVATE;
         m.createdAt = now;
+        return m;
+    }
+
+    /** Apple 로그인으로 처음 들어온 사람. 서재는 닫혀 있고 기본 공개 범위는 비공개다(register와 같다) */
+    public static Member registerWithApple(String appleSub, String slug, String displayName, Instant now) {
+        if (appleSub == null || appleSub.isBlank()) {
+            throw new DomainException("Apple 사용자 식별자가 없다");
+        }
+        Member m = register(slug, displayName, now);
+        m.appleSub = appleSub;
         return m;
     }
 
