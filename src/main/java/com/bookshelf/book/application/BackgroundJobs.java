@@ -15,14 +15,22 @@ import org.springframework.scheduling.annotation.Scheduled;
 class BackgroundJobs {
 
     private final RefreshWorker refresh;
+    private final BookBackfill backfill;
 
-    BackgroundJobs(RefreshWorker refresh) {
+    BackgroundJobs(RefreshWorker refresh, BookBackfill backfill) {
         this.refresh = refresh;
+        this.backfill = backfill;
     }
 
     @Scheduled(fixedDelayString = "${bookshelf.background.refresh-interval}",
                initialDelayString = "${bookshelf.background.refresh-interval}")
     void refresh() {
         refresh.runOnce();
+    }
+
+    @Scheduled(fixedDelayString = "${bookshelf.background.backfill-interval}",
+               initialDelayString = "${bookshelf.background.backfill-interval}")
+    void backfill() {
+        backfill.runOnce();
     }
 }
