@@ -1,9 +1,12 @@
 package com.bookshelf.common;
 
+import com.bookshelf.auth.ApiAuthenticationEntryPoint;
+import com.bookshelf.auth.UnauthorizedException;
 import com.bookshelf.provider.ProviderUnavailableException;
 import com.bookshelf.search.SearchUnavailableException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -20,6 +23,14 @@ public class ApiExceptionHandler {
     ResponseEntity<ApiError> badRequest(DomainException e) {
         log.debug("400 {}", e.getMessage());
         return ResponseEntity.badRequest().body(new ApiError("BAD_REQUEST", e.getMessage()));
+    }
+
+    /** 필터에서 거부된 401과 본문이 같아야 한다 — 어느 단계에서 실패했는지 드러내지 않는다 */
+    @ExceptionHandler(UnauthorizedException.class)
+    ResponseEntity<String> unauthorized(UnauthorizedException e) {
+        log.debug("401 {}", e.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).contentType(MediaType.APPLICATION_JSON)
+                .body(ApiAuthenticationEntryPoint.BODY);
     }
 
     @ExceptionHandler(NotFoundException.class)

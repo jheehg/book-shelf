@@ -19,7 +19,7 @@ import java.nio.charset.StandardCharsets;
 @Component
 public class ApiAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
-    static final String BODY = "{\"code\":\"UNAUTHORIZED\",\"message\":\"다시 로그인해 주세요\"}";
+    public static final String BODY = "{\"code\":\"UNAUTHORIZED\",\"message\":\"다시 로그인해 주세요\"}";
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response,
