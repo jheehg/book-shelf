@@ -3,3 +3,11 @@
 
 ### 로컬 전용 Claude 지시
 CLAUDE.local.md
+
+### 빌드 산출물
+.gradle/
+build/
+out/
+.idea/
+*.iml
+.vscode/

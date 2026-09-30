@@ -1,0 +1,51 @@
+spring:
+  application:
+    name: book-shelf
+  datasource:
+    # 로컬 기본값을 두고 서버는 환경변수로 덮는다(spring-study와 같은 타협)
+    url: ${DB_URL:jdbc:postgresql://localhost:5433/bookshelf}
+    username: ${DB_USERNAME:bookshelf}
+    password: ${DB_PASSWORD:localdev}
+  jpa:
+    hibernate:
+      # 스키마는 Flyway만 만든다. validate는 엔티티와 스키마가 어긋나면 기동을 실패시킨다
+      ddl-auto: validate
+    open-in-view: false
+  flyway:
+    locations: classpath:db/migration
+
+server:
+  # Nginx 뒤에서 https·호스트를 올바로 인식한다 (spring-study 3주차 지뢰를 처음부터 막는다)
+  forward-headers-strategy: framework
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+
+providers:
+  kakao:
+    rest-api-key: ${KAKAO_REST_API_KEY}   # 기본값 없음 — 없으면 기동 실패
+    base-url: ${KAKAO_BASE_URL:https://dapi.kakao.com}
+    # 실측 55~204ms (docs/notes/providers.md). 최댓값의 5배/10배
+    connect-timeout: 1s
+    read-timeout: 2s
+    # 공식 일 30,000의 90% / 60% (설계 문서 6-3)
+    daily-limit: 27000
+    background-ceiling: 18000
+    # 한도 초기화 시간대 (가정 — Task 0 Step 5에서 확인)
+    reset-zone: Asia/Seoul
+    cool-down: 60s
+
+bookshelf:
+  site-url: ${SITE_URL:http://localhost:8080}
+  sale-ttl: 6h
+  search-cache-ttl: 24h
+  background:
+    enabled: ${BACKGROUND_JOBS_ENABLED:true}
+    # @Scheduled 문자열에도 그대로 쓰므로 ISO-8601로 적는다
+    refresh-interval: PT1M
+    refresh-batch-size: 20
+    backfill-interval: PT10M
+    backfill-batch-size: 20
