@@ -80,4 +80,22 @@ public class ReadingRecord {
         this.visibility = visibility;
         this.updatedAt = now;
     }
+
+    public void changeStatus(ReadingStatus status, Instant now) {
+        if (status == null) {
+            throw new DomainException("읽는 상태가 없다");
+        }
+        this.status = status;
+        this.updatedAt = now;
+    }
+
+    /** 둘 다 비울 수 있다. 둘 다 있으면 완료일이 시작일보다 앞일 수 없다 */
+    public void readBetween(LocalDate startedAt, LocalDate finishedAt, Instant now) {
+        if (startedAt != null && finishedAt != null && finishedAt.isBefore(startedAt)) {
+            throw new DomainException("다 읽은 날이 시작한 날보다 앞이다");
+        }
+        this.startedAt = startedAt;
+        this.finishedAt = finishedAt;
+        this.updatedAt = now;
+    }
 }

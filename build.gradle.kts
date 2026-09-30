@@ -64,4 +64,8 @@ tasks.withType<Test> {
     // 테스트용 EC 개인키(PKCS8, 줄바꿈은 |). 실제 Apple 키가 아니다 — 어디에도 등록되지 않는다
     environment("APPLE_PRIVATE_KEY", file("src/test/resources/apple/test-client-key.p8").readText().replace("\n", "|"))
     systemProperty("providers.library.cool-down", "0s")
+    // @DynamicPropertySource·@Import가 다른 테스트마다 스프링 컨텍스트가 따로 캐시된다. 컨텍스트마다
+    // 커넥션 10개(기본)를 쥐면 Postgres 연결 한도(100)를 넘는다 — 테스트에서는 풀을 작게 둔다
+    systemProperty("spring.datasource.hikari.maximum-pool-size", "3")
+    systemProperty("spring.datasource.hikari.minimum-idle", "0")
 }

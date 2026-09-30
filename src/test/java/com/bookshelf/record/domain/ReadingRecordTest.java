@@ -62,4 +62,20 @@ class ReadingRecordTest {
         r.changeVisibility(Visibility.RATING_ONLY, NOW);
         assertThat(r.getVisibility()).isEqualTo(Visibility.RATING_ONLY);
     }
+
+    @Test
+    void 읽는_상태를_바꾼다() {
+        ReadingRecord r = newRecord();
+        r.changeStatus(ReadingStatus.READING, NOW);
+        assertThat(r.getStatus()).isEqualTo(ReadingStatus.READING);
+    }
+
+    @Test
+    void 완료일이_시작일보다_앞이면_거부한다() {
+        ReadingRecord r = newRecord();
+        r.readBetween(java.time.LocalDate.of(2026, 9, 1), java.time.LocalDate.of(2026, 9, 20), NOW);
+        assertThat(r.getFinishedAt()).isEqualTo(java.time.LocalDate.of(2026, 9, 20));
+        assertThatThrownBy(() -> r.readBetween(java.time.LocalDate.of(2026, 9, 20), java.time.LocalDate.of(2026, 9, 1), NOW))
+                .isInstanceOf(DomainException.class);
+    }
 }
