@@ -24,6 +24,11 @@ management:
       exposure:
         include: health
 
+jwt:
+  secret: ${JWT_SECRET}            # 기본값 없음. 32바이트 이상 (JwtProperties가 검사)
+  access-token-ttl: 30m
+  refresh-token-ttl: 14d
+
 providers:
   kakao:
     rest-api-key: ${KAKAO_REST_API_KEY}   # 기본값 없음 — 없으면 기동 실패

@@ -1,0 +1,42 @@
+package com.bookshelf.common;
+
+import com.bookshelf.provider.ProviderUnavailableException;
+import com.bookshelf.search.SearchUnavailableException;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+/**
+ * /api 의 예외 → 응답. Exception.class를 잡지 않는다 — 예상 못 한 예외는 500으로 드러나야 한다.
+ * 4xx는 warn이 아니라 debug: 사용자의 잘못된 입력은 운영 경보가 아니다. 503은 warn(제공자 장애 신호).
+ */
+@Slf4j
+@RestControllerAdvice(basePackages = "com.bookshelf")
+public class ApiExceptionHandler {
+
+    @ExceptionHandler(DomainException.class)
+    ResponseEntity<ApiError> badRequest(DomainException e) {
+        log.debug("400 {}", e.getMessage());
+        return ResponseEntity.badRequest().body(new ApiError("BAD_REQUEST", e.getMessage()));
+    }
+
+    @ExceptionHandler(NotFoundException.class)
+    ResponseEntity<ApiError> notFound(NotFoundException e) {
+        log.debug("404 {}", e.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiError("NOT_FOUND", "찾을 수 없어요"));
+    }
+
+    @ExceptionHandler(ConflictException.class)
+    ResponseEntity<ApiError> conflict(ConflictException e) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(new ApiError("CONFLICT", e.getMessage()));
+    }
+
+    @ExceptionHandler({SearchUnavailableException.class, ProviderUnavailableException.class})
+    ResponseEntity<ApiError> tryLater(RuntimeException e) {
+        log.warn("503 {}", e.getMessage());
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                .body(new ApiError("TRY_LATER", "잠시 후 다시 시도해 주세요"));
+    }
+}

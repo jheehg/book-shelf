@@ -26,6 +26,9 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-flyway")
     // 보내는 쪽(RestClient.Builder 빈)은 webmvc와 별개 모듈이다. 빠지면 컴파일은 되고 기동에서 빈이 없다며 실패한다
     implementation("org.springframework.boot:spring-boot-starter-restclient")
+    implementation("org.springframework.boot:spring-boot-starter-security")
+    // Boot 4의 새 이름. 우리 JWT(HS256) 검증과 Apple identity token(RS256, JWKS) 검증을 Nimbus로 한다
+    implementation("org.springframework.boot:spring-boot-starter-security-oauth2-resource-server")
     runtimeOnly("org.flywaydb:flyway-database-postgresql")
     runtimeOnly("org.postgresql:postgresql")
     compileOnly("org.projectlombok:lombok")
@@ -33,6 +36,7 @@ dependencies {
 
     testImplementation("org.springframework.boot:spring-boot-starter-data-jpa-test")
     testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
+    testImplementation("org.springframework.security:spring-security-test")
     testImplementation("org.wiremock:wiremock-standalone:3.13.1")
     // 공개 조회 경계를 "사람의 기억"이 아니라 "빌드 실패"로 지킨다 (PublicViewArchitectureTest)
     testImplementation("com.tngtech.archunit:archunit-junit5:1.4.1")
@@ -51,4 +55,13 @@ tasks.withType<Test> {
     // 쿨다운은 싱글턴 빈의 상태라 한 테스트의 실패가 다음 테스트로 샌다.
     // 컨텍스트 전체에서는 끄고, 쿨다운 자체는 KakaoBookCatalogTest가 직접 조립해 검증한다
     systemProperty("providers.kakao.cool-down", "0s")
+    // Phase 2 테스트용 값(모두 가짜)
+    environment("JWT_SECRET", "test-jwt-secret-test-jwt-secret-0123456789abcdef")
+    environment("LIBRARY_API_KEY", "test-library-key")
+    environment("APPLE_CLIENT_ID", "com.bookshelf.test")
+    environment("APPLE_TEAM_ID", "TESTTEAM00")
+    environment("APPLE_KEY_ID", "TESTKEY000")
+    // 테스트용 EC 개인키(PKCS8, 줄바꿈은 |). 실제 Apple 키가 아니다 — 어디에도 등록되지 않는다
+    environment("APPLE_PRIVATE_KEY", file("src/test/resources/apple/test-client-key.p8").readText().replace("\n", "|"))
+    systemProperty("providers.library.cool-down", "0s")
 }
