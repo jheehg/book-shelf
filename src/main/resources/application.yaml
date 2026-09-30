@@ -55,6 +55,17 @@ providers:
     # 한도 초기화 시간대 (가정 — 카카오 문서·약관으로 확인할 것)
     reset-zone: Asia/Seoul
     cool-down: 60s
+  library:
+    api-key: ${LIBRARY_API_KEY}           # 기본값 없음 — 없으면 기동 실패
+    base-url: ${LIBRARY_BASE_URL:https://data4library.kr}
+    # 실측 330~650ms (docs/notes/providers.md)
+    connect-timeout: 1s
+    read-timeout: 3s
+    # 서버 IP 미등록 일 500의 90% / 60% (설계 문서 6-3, 6-7). IP를 등록해 한도가 오르면 여기만 바꾼다
+    daily-limit: 450
+    background-ceiling: 300
+    reset-zone: Asia/Seoul
+    cool-down: 60s
 
 bookshelf:
   site-url: ${SITE_URL:http://localhost:8080}
