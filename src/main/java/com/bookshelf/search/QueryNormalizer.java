@@ -4,7 +4,7 @@ import java.text.Normalizer;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
-/** 규칙과 이유: docs/notes/search-normalization.md (Task 7 Step 0) */
+/** 규칙과 이유: docs/notes/search-normalization.md */
 public final class QueryNormalizer {
 
     private static final int MIN = 2;

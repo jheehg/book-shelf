@@ -63,7 +63,7 @@ public class StoreLinks {
         return title == null ? "" : title.replaceAll("\\s*[(\\[][^)\\]]*[)\\]]", "").strip();
     }
 
-    /** "조앤 K. 롤링, 강동혁" → "조앤 K. 롤링". 저자가 여럿이면 Task 4가 쉼표로 잇는다 — 첫 사람만 쓴다 */
+    /** "조앤 K. 롤링, 강동혁" → "조앤 K. 롤링". 저자가 여럿이면 KakaoBookCatalog가 쉼표로 잇는다 — 첫 사람만 쓴다 */
     private static String firstAuthor(String author) {
         return author.split(",")[0].strip();
     }

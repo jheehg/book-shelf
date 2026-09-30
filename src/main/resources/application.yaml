@@ -2,7 +2,7 @@ spring:
   application:
     name: book-shelf
   datasource:
-    # 로컬 기본값을 두고 서버는 환경변수로 덮는다(spring-study와 같은 타협)
+    # 로컬 기본값을 두고 서버는 환경변수로 덮는다. DB 비밀번호 기본값은 로컬 편의를 위한 타협이다 — 서버에서는 반드시 환경변수로 준다
     url: ${DB_URL:jdbc:postgresql://localhost:5433/bookshelf}
     username: ${DB_USERNAME:bookshelf}
     password: ${DB_PASSWORD:localdev}
@@ -15,7 +15,7 @@ spring:
     locations: classpath:db/migration
 
 server:
-  # Nginx 뒤에서 https·호스트를 올바로 인식한다 (spring-study 3주차 지뢰를 처음부터 막는다)
+  # Nginx 뒤에서 https·호스트를 올바로 인식한다. 없으면 앱이 만드는 절대 URL(og:url 등)이 http://로 나간다
   forward-headers-strategy: framework
 
 management:
@@ -34,7 +34,7 @@ providers:
     # 공식 일 30,000의 90% / 60% (설계 문서 6-3)
     daily-limit: 27000
     background-ceiling: 18000
-    # 한도 초기화 시간대 (가정 — Task 0 Step 5에서 확인)
+    # 한도 초기화 시간대 (가정 — 카카오 문서·약관으로 확인할 것)
     reset-zone: Asia/Seoul
     cool-down: 60s
 
@@ -54,7 +54,7 @@ bookshelf:
 # 확인 방법: {isbn}=9788936434120, {title}=소년이 온다, {author}=한강 으로 열어 그 책이 보이는가
 # 마지막 확인: 2026-09-30 — 교보문고·알라딘·알라딘 중고·Google Play 도서·리디·교보eBook은 결과에 책이 보였다.
 # 미확인: 예스24·예스24 중고(어떤 형식이든 메인으로 돌려보냄 — 비브라우저 차단으로 보임), 영풍문고·밀리의서재(JS 페이지).
-#         Task 11 Step 8에서 브라우저로 눌러 보고 고친다
+#         브라우저로 눌러 보고 고친다
 store-links:
   entries:
     - { group: NEW,   name: 교보문고,        template: "https://search.kyobobook.co.kr/search?keyword={isbn}" }

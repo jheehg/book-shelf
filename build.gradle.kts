@@ -24,7 +24,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
     // Boot 4는 자동설정을 모듈별로 쪼갰다. flyway-core만 넣으면 자동 적용이 안 된다
     implementation("org.springframework.boot:spring-boot-starter-flyway")
-    // 보내는 쪽(RestClient.Builder 빈)은 webmvc와 별개 모듈이다 — spring-study 8주차에 기동에서 터졌던 것
+    // 보내는 쪽(RestClient.Builder 빈)은 webmvc와 별개 모듈이다. 빠지면 컴파일은 되고 기동에서 빈이 없다며 실패한다
     implementation("org.springframework.boot:spring-boot-starter-restclient")
     runtimeOnly("org.flywaydb:flyway-database-postgresql")
     runtimeOnly("org.postgresql:postgresql")
@@ -34,7 +34,7 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-data-jpa-test")
     testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
     testImplementation("org.wiremock:wiremock-standalone:3.13.1")
-    // 공개 조회 경계를 "사람의 기억"이 아니라 "빌드 실패"로 지킨다 (Task 9)
+    // 공개 조회 경계를 "사람의 기억"이 아니라 "빌드 실패"로 지킨다 (PublicViewArchitectureTest)
     testImplementation("com.tngtech.archunit:archunit-junit5:1.4.1")
     testCompileOnly("org.projectlombok:lombok")
     testAnnotationProcessor("org.projectlombok:lombok")
@@ -49,6 +49,6 @@ tasks.withType<Test> {
     // 테스트 컨텍스트에서 백그라운드 작업(갱신 큐, 백필)이 스스로 돌지 않게 한다. 테스트는 runOnce()를 직접 부른다
     environment("BACKGROUND_JOBS_ENABLED", "false")
     // 쿨다운은 싱글턴 빈의 상태라 한 테스트의 실패가 다음 테스트로 샌다.
-    // 컨텍스트 전체에서는 끄고, 쿨다운 자체는 KakaoBookCatalogTest가 직접 조립해 검증한다 (Task 4)
+    // 컨텍스트 전체에서는 끄고, 쿨다운 자체는 KakaoBookCatalogTest가 직접 조립해 검증한다
     systemProperty("providers.kakao.cool-down", "0s")
 }

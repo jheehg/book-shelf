@@ -1,5 +1,5 @@
 -- V1: 초기 스키마 (Phase 1에서 쓰는 테이블만. 도서관·전자책 테이블은 실측 뒤 V2 이후로).
--- 배포(Task 12) 이후에는 절대 이 파일을 고치지 않는다. 변경은 V2부터.
+-- 첫 배포 이후에는 절대 이 파일을 고치지 않는다. 변경은 V2부터.
 
 -- ── 내 데이터 ──────────────────────────────────────────────
 CREATE TABLE member (
@@ -51,20 +51,20 @@ CREATE TABLE sale_snapshot (
 );
 
 -- ── 우리의 장부 ────────────────────────────────────────────
--- 제공자가 모르는 ISBN을 백필이 매번 다시 묻지 않게 한다 (Task 8)
+-- 제공자가 모르는 ISBN을 백필이 매번 다시 묻지 않게 한다 (BookBackfill)
 CREATE TABLE book_lookup_failure (
     isbn13       VARCHAR(13)  PRIMARY KEY,
     attempts     INTEGER      NOT NULL,
     next_try_at  TIMESTAMPTZ  NOT NULL
 );
 
--- 공개 페이지가 넣고 백그라운드 작업이 뺀다. ISBN당 한 줄 — 봇이 같은 페이지를 백 번 열어도 한 줄 (Task 6)
+-- 공개 페이지가 넣고 백그라운드 작업이 뺀다. ISBN당 한 줄 — 봇이 같은 페이지를 백 번 열어도 한 줄 (RefreshQueue)
 CREATE TABLE refresh_request (
     isbn13        VARCHAR(13)  PRIMARY KEY,
     requested_at  TIMESTAMPTZ  NOT NULL
 );
 
--- 정규화한 검색어 → 결과 ISBN 목록. 책 정보는 book 테이블에 있다 (Task 7)
+-- 정규화한 검색어 → 결과 ISBN 목록. 책 정보는 book 테이블에 있다 (SearchService)
 CREATE TABLE search_cache (
     query_key   VARCHAR(200)  NOT NULL,
     page        INTEGER       NOT NULL,
@@ -74,7 +74,7 @@ CREATE TABLE search_cache (
     PRIMARY KEY (query_key, page)
 );
 
--- 오늘 제공자별로 몇 번 불렀는가. 설계 문서 8장 "관측"의 전부 (Task 3)
+-- 오늘 제공자별로 몇 번 불렀는가. 설계 문서 8장 "관측"의 전부 (CallBudget)
 CREATE TABLE provider_call_counter (
     provider  VARCHAR(20)  NOT NULL,
     day       DATE         NOT NULL,      -- 그 제공자의 한도 초기화 시간대 기준 날짜

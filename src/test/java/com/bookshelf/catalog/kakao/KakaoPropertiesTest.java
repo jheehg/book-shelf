@@ -12,7 +12,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 /**
  * 키가 없으면 기동이 실패해야 한다 (전역 규칙: 시크릿에 기본값을 두지 않는다).
  * @ConfigurationProperties 바인딩은 치환 못 한 "${KAKAO_REST_API_KEY}"를 문자 그대로 넣고 넘어간다 —
- * @Value와 달리 기동이 실패하지 않는다(Task 4 Step 9에서 실제로 겪었다). 그래서 여기서 직접 막는다.
+ * @Value와 달리 기동이 실패하지 않는다(실제로 키 없이 서버가 떴다). 그래서 여기서 직접 막는다.
  */
 class KakaoPropertiesTest {
 

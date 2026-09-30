@@ -85,7 +85,7 @@ class PublicBoundaryTest {
     void 책_정보가_아직_없는_공개_기록도_서재에_나오되_제목이_없다() {
         PublicEntry e = entry("open", NO_BOOK);
 
-        assertThat(e.title()).isNull();       // 템플릿은 이때 책 페이지 링크를 걸지 않는다 (Task 11)
+        assertThat(e.title()).isNull();       // 템플릿은 이때 책 페이지 링크를 걸지 않는다 (shelf.html)
         assertThat(e).isInstanceOf(RatedEntry.class);
     }
 
@@ -102,7 +102,7 @@ class PublicBoundaryTest {
     }
 
     /**
-     * 탈퇴(withdraw)는 서재 스위치도 끈다 — 그래서 deleted_at 조건만 빠뜨리면 다른 테스트가 잡지 못한다(Step 6 대조군).
+     * 탈퇴(withdraw)는 서재 스위치도 끈다 — 그래서 deleted_at 조건만 빠뜨리면 다른 테스트가 잡지 못한다(조건을 하나씩 지워 보다 드러났다).
      * 스위치가 켜진 채 탈퇴한 행(버그·수동 수정)을 직접 만들어 deleted_at 조건 하나만으로도 막히는지 본다.
      */
     @Test

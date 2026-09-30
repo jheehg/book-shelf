@@ -47,7 +47,7 @@ public class KakaoBookCatalog implements BookCatalog {
     private final KakaoProperties props;
     private final Clock clock;
 
-    /** 마지막 실패 후 이 시각까지 백그라운드 호출을 보내지 않는다 (Review Focus 3) */
+    /** 마지막 실패 후 이 시각까지 백그라운드 호출을 보내지 않는다 — 카카오가 죽었을 때 매번 타임아웃을 기다리지 않게 */
     private volatile Instant coolDownUntil = Instant.MIN;
 
     public KakaoBookCatalog(RestClient kakaoRestClient, CallBudget budget, KakaoProperties props, Clock clock) {
@@ -98,7 +98,7 @@ public class KakaoBookCatalog implements BookCatalog {
         }
     }
 
-    /** 같은 ISBN이 두 번 오면 먼저 온 것만 남긴다 (Review Focus 5). 순서는 카카오의 정확도 순서 그대로 */
+    /** 같은 ISBN이 두 번 오면 먼저 온 것만 남긴다(같은 책이 두 번 저장되지 않게). 순서는 카카오의 정확도 순서 그대로 */
     private List<CatalogBook> toBooks(KakaoResponse r) {
         Map<Isbn13, CatalogBook> byIsbn = new LinkedHashMap<>();
         if (r.documents() == null) {

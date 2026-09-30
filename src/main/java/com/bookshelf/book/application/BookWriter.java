@@ -54,7 +54,7 @@ public class BookWriter {
 
     /**
      * 제공자가 모르는 책의 판매 칸. "판매 정보 없음"도 기준 시각이 있는 스냅샷이다 —
-     * 없으면 봇이 그 책 페이지를 열 때마다 갱신 큐에 다시 들어간다 (Review Focus 1).
+     * 없으면 봇이 그 책 페이지를 열 때마다 갱신 큐에 다시 들어간다.
      */
     @Transactional
     public void saveUnknownSale(Isbn13 isbn) {
