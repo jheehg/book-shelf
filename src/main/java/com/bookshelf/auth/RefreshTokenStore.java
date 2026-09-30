@@ -82,6 +82,13 @@ public class RefreshTokenStore {
         return new Rotated(row.memberId(), issue(row.memberId(), now));
     }
 
+    /** 만료된 토큰은 어차피 401이다. 회전된(used_at) 토큰도 만료 전까지는 재사용 감지에 필요하므로 만료 후에만 지운다 */
+    public int purgeExpired(Instant now) {
+        return jdbc.sql("DELETE FROM refresh_token WHERE expires_at < :now")
+                .param("now", Timestamp.from(now))
+                .update();
+    }
+
     public void revoke(String raw) {
         jdbc.sql("DELETE FROM refresh_token WHERE token_hash = :h").param("h", hash(raw)).update();
     }

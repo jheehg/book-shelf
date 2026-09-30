@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -39,6 +41,12 @@ public class ApiExceptionHandler {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     ResponseEntity<ApiError> unreadable(HttpMessageNotReadableException e) {
         log.debug("400 본문 해석 실패 {}", e.getMostSpecificCause().getMessage());
+        return ResponseEntity.badRequest().body(new ApiError("BAD_REQUEST", "요청 형식이 올바르지 않아요"));
+    }
+
+    @ExceptionHandler({MethodArgumentTypeMismatchException.class, MissingServletRequestParameterException.class})
+    ResponseEntity<ApiError> badParam(Exception e) {
+        log.debug("400 파라미터 {}", e.getMessage());
         return ResponseEntity.badRequest().body(new ApiError("BAD_REQUEST", "요청 형식이 올바르지 않아요"));
     }
 

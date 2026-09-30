@@ -32,4 +32,9 @@ public class BookLookupService {
         }
         return catalog.lookup(isbn, purpose).map(writer::saveLookup);
     }
+
+    /** 링크처럼 책 정보만 있으면 되는 곳에서 쓴다. 제공자를 부르지 않는다 */
+    public Optional<BookView> findLocal(Isbn13 isbn) {
+        return books.findById(isbn.value()).map(BookView::of);
+    }
 }
