@@ -65,6 +65,25 @@ public class Member {
         return m;
     }
 
+    public void changeSlug(String slug) {
+        if (slug == null || !SLUG.matcher(slug).matches()) {
+            throw new DomainException("slug 규칙 위반: " + slug);
+        }
+        this.slug = slug;
+    }
+
+    public void rename(String displayName) {
+        String name = displayName == null ? "" : displayName.strip();
+        if (name.isEmpty() || name.codePointCount(0, name.length()) > 30) {
+            throw new DomainException("표시 이름은 1~30자다");
+        }
+        this.displayName = name;
+    }
+
+    public boolean isDeleted() {
+        return deletedAt != null;
+    }
+
     public void openShelf() {
         this.shelfPublic = true;
     }

@@ -6,6 +6,7 @@ import com.bookshelf.provider.ProviderUnavailableException;
 import com.bookshelf.provider.UserQuotaExceededException;
 import com.bookshelf.search.SearchUnavailableException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -43,6 +44,13 @@ public class ApiExceptionHandler {
     @ExceptionHandler(ConflictException.class)
     ResponseEntity<ApiError> conflict(ConflictException e) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(new ApiError("CONFLICT", e.getMessage()));
+    }
+
+    /** 검사를 통과한 동시 요청이 UNIQUE 제약에 걸린 경우. 제약 이름을 응답에 내보내지 않는다 */
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    ResponseEntity<ApiError> integrity(DataIntegrityViolationException e) {
+        log.debug("409 {}", e.getMostSpecificCause().getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(new ApiError("CONFLICT", "이미 있어요"));
     }
 
     @ExceptionHandler(UserQuotaExceededException.class)

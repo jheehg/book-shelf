@@ -63,9 +63,8 @@ class SecurityBoundaryTest {
 
     @Test
     void 우리가_발급한_토큰이면_API를_통과한다() throws Exception {
-        // /api/me는 Task 5에서 생긴다. 지금은 인증을 통과해 핸들러가 없어 404가 나면 된다 — 401이 아니면 통과한 것이다
-        int status = mvc.perform(get("/api/me").header("Authorization", TestJwt.bearer(encoder, 1)))
-                .andReturn().getResponse().getStatus();
-        assertThat(status).isNotEqualTo(401);
+        long id = fx.member("token-owner", false).getId();
+
+        mvc.perform(get("/api/me").header("Authorization", TestJwt.bearer(encoder, id))).andExpect(status().isOk());
     }
 }
