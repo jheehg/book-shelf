@@ -125,6 +125,20 @@ class BookBackfillTest {
         assertThat(KakaoStub.calls()).isEqualTo(1);
     }
 
+    /** 체크섬은 DB CHECK가 못 본다. 수동 SQL로 들어온 틀린 ISBN 한 줄이 회차 전체를 멈추면 안 된다 */
+    @Test
+    void 체크섬이_틀린_ISBN_기록이_있어도_다른_책은_채운다() {
+        jdbc.sql("""
+                INSERT INTO reading_record (member_id, isbn13, status, visibility, created_at, updated_at)
+                VALUES (:m, '9780000000001', 'DONE', 'PRIVATE', now(), now())
+                """).param("m", m.getId()).update();
+        fx.record(m, A, Visibility.PRIVATE, null, null);
+        KakaoStub.returns(A, response(1, true, doc(A, "소년이 온다", 15000, 13500, "정상판매")));
+
+        assertThat(backfill.runOnce()).isEqualTo(1);
+        assertThat(books.findById(A)).isPresent();
+    }
+
     @Test
     void 예산이_바닥나면_실패로_적지_않고_멈춘다() {
         fx.record(m, A, Visibility.PRIVATE, null, null);

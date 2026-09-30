@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import java.sql.Timestamp;
 import java.time.Clock;
 import java.util.List;
+import java.util.Optional;
 
 /** 책 정보 없이 생긴 기록에 책 정보를 붙인다 (설계 문서 5장) */
 @Slf4j
@@ -50,7 +51,13 @@ public class BookBackfill {
 
         int filled = 0;
         for (String raw : pending) {
-            Isbn13 isbn = Isbn13.parse(raw);
+            // DB CHECK는 체크섬을 못 본다. 수동 SQL로 들어온 틀린 ISBN 한 줄이 회차 전체를 멈추지 않게 건너뛴다
+            Optional<Isbn13> parsed = Isbn13.tryParse(raw);
+            if (parsed.isEmpty()) {
+                log.warn("백필: 체크섬이 틀린 ISBN 기록을 건너뛴다 isbn={} — reading_record를 직접 고쳐야 한다", raw);
+                continue;
+            }
+            Isbn13 isbn = parsed.get();
             try {
                 if (lookup.findOrFetch(isbn, CallPurpose.BACKGROUND).isPresent()) {
                     filled++;

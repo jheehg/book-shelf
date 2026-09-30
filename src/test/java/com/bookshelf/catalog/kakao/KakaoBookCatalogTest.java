@@ -147,6 +147,25 @@ class KakaoBookCatalogTest {
                 .extracting(CatalogBook::title).containsExactly("소년이 온다");
     }
 
+    /** 컬럼 길이를 넘는 값이 오면 저장에서 터지고, 그 행이 큐 맨 앞에서 매분 예산을 태운다 */
+    @Test
+    void 컬럼보다_긴_값은_잘라서_옮기고_너무_긴_표지_주소는_버린다() {
+        String longTitle = "가".repeat(600);
+        String longCover = "https://search1.kakaocdn.net/" + "a".repeat(1100);
+        KakaoStub.returns(ISBN.value(), response(1, true, """
+                {"title":"%s","isbn":"%s","authors":["%s","%s"],"publisher":"%s",
+                 "datetime":"2014-05-19T00:00:00.000+09:00","price":1000,"sale_price":900,"status":"정상판매",
+                 "thumbnail":"%s"}
+                """.formatted(longTitle, ISBN.value(), "저".repeat(300), "자".repeat(300), "출".repeat(250), longCover)));
+
+        CatalogBook b = catalog().lookup(ISBN, INTERACTIVE).orElseThrow();
+
+        assertThat(b.title().codePointCount(0, b.title().length())).isEqualTo(500);
+        assertThat(b.author().codePointCount(0, b.author().length())).isEqualTo(500);
+        assertThat(b.publisher().codePointCount(0, b.publisher().length())).isEqualTo(200);
+        assertThat(b.coverUrl()).isNull();
+    }
+
     @Test
     void 가격이_0이나_음수면_null이다() {
         KakaoStub.returns(ISBN.value(), response(1, true, doc(ISBN.value(), "별책부록", 0, -1, "정상판매")));

@@ -112,11 +112,11 @@ public class KakaoBookCatalog implements BookCatalog {
             }
             byIsbn.putIfAbsent(isbn.get(), new CatalogBook(
                     isbn.get(),
-                    d.title(),
-                    d.authors() == null || d.authors().isEmpty() ? null : String.join(", ", d.authors()),
-                    blankToNull(d.publisher()),
+                    cut(d.title(), 500),
+                    d.authors() == null || d.authors().isEmpty() ? null : cut(String.join(", ", d.authors()), 500),
+                    cut(blankToNull(d.publisher()), 200),
                     parseDate(d.datetime()),
-                    blankToNull(d.thumbnail()),
+                    coverOrNull(d.thumbnail()),
                     null,                       // 카카오에는 쪽수가 없다
                     positiveOrNull(d.price()),
                     positiveOrNull(d.salePrice()),
@@ -142,6 +142,23 @@ public class KakaoBookCatalog implements BookCatalog {
     /** 카카오는 가격이 없을 때 price 0, sale_price -1을 준다 (실측 487건 중 154건) */
     private static Integer positiveOrNull(Integer value) {
         return value == null || value <= 0 ? null : value;
+    }
+
+    /**
+     * 컬럼 길이(VARCHAR는 문자 수)에 맞게 자른다. 표시용 남의 데이터라 잘려도 된다 —
+     * 넘긴 채 저장하면 그 행이 저장에서 터지고, 갱신 큐 맨 앞에 남아 매분 예산을 태운다.
+     */
+    private static String cut(String s, int maxChars) {
+        if (s == null || s.codePointCount(0, s.length()) <= maxChars) {
+            return s;
+        }
+        return s.substring(0, s.offsetByCodePoints(0, maxChars));
+    }
+
+    /** 잘린 URL은 깨진 이미지가 되므로 자르지 않고 버린다(회색 표지가 된다) */
+    private static String coverOrNull(String url) {
+        String u = blankToNull(url);
+        return u == null || u.length() > 1000 ? null : u;
     }
 
     private static String blankToNull(String s) {

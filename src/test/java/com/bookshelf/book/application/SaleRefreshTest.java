@@ -185,6 +185,16 @@ class SaleRefreshTest {
     }
 
     @Test
+    void 큐에_틀린_ISBN이_섞여도_나머지를_처리하고_그_줄은_버린다() {
+        jdbc.sql("INSERT INTO refresh_request (isbn13, requested_at) VALUES ('9780000000001', now() - interval '1 hour')").update();
+        sales.current(A);
+        KakaoStub.returns(A.value(), response(1, true, doc(A.value(), "소년이 온다", 15000, 12000, "정상판매")));
+
+        assertThat(worker.runOnce()).isEqualTo(1);
+        assertThat(queue.size()).isZero();
+    }
+
+    @Test
     void 한_회차에_정해진_수만_처리한다() {
         // 앞 12자리 9788900000nn + 체크 숫자 — 서로 다른 ISBN 25개
         for (int n = 0; n < 25; n++) {
