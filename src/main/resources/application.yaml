@@ -49,3 +49,21 @@ bookshelf:
     refresh-batch-size: 20
     backfill-interval: PT10M
     backfill-batch-size: 20
+
+# 서점 검색 링크 (설계 문서 2-1). 형식이 바뀌면 여기만 고친다.
+# 확인 방법: {isbn}=9788936434120, {title}=소년이 온다, {author}=한강 으로 열어 그 책이 보이는가
+# 마지막 확인: 2026-09-30 — 교보문고·알라딘·알라딘 중고·Google Play 도서·리디·교보eBook은 결과에 책이 보였다.
+# 미확인: 예스24·예스24 중고(어떤 형식이든 메인으로 돌려보냄 — 비브라우저 차단으로 보임), 영풍문고·밀리의서재(JS 페이지).
+#         Task 11 Step 8에서 브라우저로 눌러 보고 고친다
+store-links:
+  entries:
+    - { group: NEW,   name: 교보문고,        template: "https://search.kyobobook.co.kr/search?keyword={isbn}" }
+    - { group: NEW,   name: 예스24,          template: "https://www.yes24.com/Product/Search?domain=BOOK&query={isbn}" }
+    - { group: NEW,   name: 알라딘,          template: "https://www.aladin.co.kr/search/wsearchresult.aspx?SearchTarget=Book&SearchWord={isbn}" }
+    - { group: NEW,   name: 영풍문고,        template: "https://www.ypbooks.co.kr/search.yp?query={isbn}" }
+    - { group: USED,  name: 알라딘 중고,     template: "https://www.aladin.co.kr/search/wsearchresult.aspx?SearchTarget=Used&SearchWord={isbn}" }
+    - { group: USED,  name: 예스24 중고,     template: "https://www.yes24.com/Product/Search?domain=USED&query={isbn}" }
+    - { group: EBOOK, name: Google Play 도서, template: "https://play.google.com/store/search?q={title}+{author}&c=books" }
+    - { group: EBOOK, name: 리디,            template: "https://ridibooks.com/search?q={title}+{author}" }
+    - { group: EBOOK, name: 교보eBook,       template: "https://search.kyobobook.co.kr/search?keyword={title}+{author}&gbCode=EBK" }
+    - { group: EBOOK, name: 밀리의서재,      template: "https://www.millie.co.kr/v3/search/result?keyword={title}" }
