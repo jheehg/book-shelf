@@ -38,8 +38,17 @@ cat > .env <<'ENV'
 POSTGRES_PASSWORD=<openssl rand -base64 24>
 KAKAO_REST_API_KEY=<카카오 REST API 키>
 SITE_URL=https://<도메인>
+JWT_SECRET=<openssl rand -base64 48>
+APPLE_CLIENT_ID=<앱 번들 ID>
+APPLE_TEAM_ID=<Apple Team ID>
+APPLE_KEY_ID=<Sign in with Apple 키 ID>
+APPLE_PRIVATE_KEY="<AuthKey_XXXX.p8 내용, 줄바꿈을 |로>"
+LIBRARY_API_KEY=<정보나루 인증키>
 ENV
 chmod 600 .env
+
+# APPLE_PRIVATE_KEY는 맥에서 `tr '\n' '|' < AuthKey_XXXX.p8`로 만든다.
+# JWT_SECRET을 바꾸면 모든 access 토큰이 무효가 된다(refresh 토큰은 DB에 있어 그대로 — 앱이 다음 요청에서 새 access를 받는다)
 
 NGINX_CONF=./nginx.http.conf docker compose -f deploy/compose.server.yaml --env-file .env up -d
 curl -s localhost/actuator/health            # {"status":"UP"}
@@ -61,7 +70,7 @@ docker compose -f deploy/compose.server.yaml --env-file .env up -d   # 기본 ng
 3절(이미지) → `git pull` → `docker compose -f deploy/compose.server.yaml --env-file .env up -d`.
 스키마 변경은 Flyway가 기동 시 적용한다. **배포된 V 파일은 고치지 않는다.**
 
-## 6. 본인 서재 (Phase 2 전까지)
+## 6. 본인 서재
 ```bash
 docker exec -i bookshelf-postgres psql -U bookshelf -d bookshelf -v ON_ERROR_STOP=1 \
   -v slug=<slug> -v name='<이름>' -f - < deploy/seed-owner.sql
@@ -74,10 +83,14 @@ SQL
 ```
 백필이 10분 안에 책 정보를 채운다. 확인: `SELECT isbn13, title FROM book;`
 
+Apple 로그인을 붙인 뒤(Phase 2 배포 후) 한 번: 이 회원을 앱의 Apple 계정에 잇는다 — `deploy/link-owner-apple.sql`의 사용법 주석을 따른다.
+
 ## 7. 관측
 ```bash
 docker exec bookshelf-postgres psql -U bookshelf -d bookshelf -c "SELECT * FROM provider_call_counter ORDER BY day DESC LIMIT 7"
 docker exec bookshelf-postgres psql -U bookshelf -d bookshelf -c "SELECT count(*) FROM refresh_request"
+docker exec bookshelf-postgres psql -U bookshelf -d bookshelf -c "SELECT member_id, calls FROM user_call_counter WHERE day = current_date ORDER BY calls DESC LIMIT 5"
+docker exec bookshelf-postgres psql -U bookshelf -d bookshelf -c "SELECT finished_at, libraries FROM library_sync_run ORDER BY finished_at DESC LIMIT 3"
 docker logs bookshelf-app 2>&1 | grep -E '(호출|예산|갱신|백필)'
 docker stats --no-stream
 ```
@@ -87,3 +100,9 @@ docker stats --no-stream
 ssh -L 15432:$(ssh bookshelf "docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' bookshelf-postgres"):5432 bookshelf
 # 다른 터미널: psql -h localhost -p 15432 -U bookshelf bookshelf
 ```
+
+## 9. 정보나루 서버 IP (한도를 올릴 때)
+서버 IP를 등록하지 않으면 정보나루는 하루 500회까지다. 우리는 450(백그라운드 300)에서 멈춘다(설계 6-3).
+`provider_call_counter`의 LIBRARY가 며칠 연속 360(80%)을 넘거나 공개 출시 전이면:
+1. 정보나루 마이페이지 → 인증키 → 서버 정보에 서버 공인 IP를 등록한다 (`curl -s ifconfig.me`)
+2. 오른 한도를 확인한 뒤 `application.yaml`의 `providers.library.daily-limit`·`background-ceiling`을 그 90%·60%로 바꿔 재배포한다
