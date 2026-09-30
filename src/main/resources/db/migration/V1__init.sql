@@ -7,22 +7,24 @@ CREATE TABLE member (
     slug                VARCHAR(30)  NOT NULL UNIQUE,   -- 공개 URL. 공개 조회의 유일한 입구
     display_name        VARCHAR(30)  NOT NULL,
     shelf_public        BOOLEAN      NOT NULL DEFAULT FALSE,  -- 서재 페이지 자체를 여닫는 스위치
-    default_visibility  VARCHAR(20)  NOT NULL DEFAULT 'PRIVATE',
+    default_visibility  VARCHAR(20)  NOT NULL DEFAULT 'PRIVATE'
+                        CHECK (default_visibility IN ('PUBLIC', 'RATING_ONLY', 'PRIVATE')),
     created_at          TIMESTAMPTZ  NOT NULL,
     deleted_at          TIMESTAMPTZ                     -- 탈퇴. 공개 조회는 이 컬럼이 NULL인 행만 본다
 );
 
 -- ★ 절대 잃으면 안 되는 것. book에 FK를 걸지 않는다 — 책 정보는 나중에 붙는다
+-- 첫 배포 직후 기록을 넣는 길은 수동 SQL뿐이라 CHECK가 마지막 방어선이다(체크섬은 Isbn13이 본다)
 CREATE TABLE reading_record (
     id           BIGSERIAL    PRIMARY KEY,
     member_id    BIGINT       NOT NULL,
-    isbn13       VARCHAR(13)  NOT NULL,
-    status       VARCHAR(10)  NOT NULL,
+    isbn13       VARCHAR(13)  NOT NULL CHECK (isbn13 ~ '^97[89][0-9]{10}$'),
+    status       VARCHAR(10)  NOT NULL CHECK (status IN ('WANT', 'READING', 'DONE')),
     rating       INTEGER      CHECK (rating BETWEEN 1 AND 5),
     review       VARCHAR(200),
     started_at   DATE,
     finished_at  DATE,
-    visibility   VARCHAR(20)  NOT NULL,
+    visibility   VARCHAR(20)  NOT NULL CHECK (visibility IN ('PUBLIC', 'RATING_ONLY', 'PRIVATE')),
     created_at   TIMESTAMPTZ  NOT NULL,
     updated_at   TIMESTAMPTZ  NOT NULL,
     CONSTRAINT uq_record_member_isbn UNIQUE (member_id, isbn13)
@@ -46,7 +48,7 @@ CREATE TABLE sale_snapshot (
     isbn13       VARCHAR(13)  PRIMARY KEY,
     list_price   INTEGER,
     sale_price   INTEGER,
-    status       VARCHAR(10)  NOT NULL,      -- ON_SALE / ORDER / UNKNOWN
+    status       VARCHAR(10)  NOT NULL CHECK (status IN ('ON_SALE', 'ORDER', 'UNKNOWN')),
     fetched_at   TIMESTAMPTZ  NOT NULL
 );
 
