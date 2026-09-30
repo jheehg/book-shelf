@@ -38,6 +38,8 @@ apple:
   jwks-uri: ${APPLE_JWKS_URI:https://appleid.apple.com/auth/keys}
 
 providers:
+  user:
+    daily-limit: 300    # 사용자별 하루 제공자 호출 (캐시 미스만 센다) — 설계 문서 6-3
   kakao:
     rest-api-key: ${KAKAO_REST_API_KEY}   # 기본값 없음 — 없으면 기동 실패
     base-url: ${KAKAO_BASE_URL:https://dapi.kakao.com}

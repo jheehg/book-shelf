@@ -5,7 +5,6 @@ import com.bookshelf.catalog.BookCatalog;
 import com.bookshelf.catalog.CatalogBook;
 import com.bookshelf.catalog.CatalogPage;
 import com.bookshelf.common.Isbn13;
-import com.bookshelf.provider.BudgetExhaustedException;
 import com.bookshelf.provider.CallBudget;
 import com.bookshelf.provider.CallPurpose;
 import com.bookshelf.provider.Provider;
@@ -86,9 +85,7 @@ public class KakaoBookCatalog implements BookCatalog {
         if (purpose == CallPurpose.BACKGROUND && clock.instant().isBefore(coolDownUntil)) {
             throw new ProviderUnavailableException(Provider.KAKAO, "쿨다운 중 (" + coolDownUntil + "까지)");
         }
-        if (!budget.tryAcquire(props.policy(), purpose)) {
-            throw new BudgetExhaustedException(Provider.KAKAO, purpose);
-        }
+        budget.acquire(props.policy(), purpose);   // 사용자 상한 → 제공자 상한. 넘으면 예외
         try {
             byte[] body = rest.get().uri(uri).retrieve().body(byte[].class);
             return JSON.readValue(body, KakaoResponse.class);

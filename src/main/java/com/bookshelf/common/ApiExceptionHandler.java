@@ -3,6 +3,7 @@ package com.bookshelf.common;
 import com.bookshelf.auth.ApiAuthenticationEntryPoint;
 import com.bookshelf.auth.UnauthorizedException;
 import com.bookshelf.provider.ProviderUnavailableException;
+import com.bookshelf.provider.UserQuotaExceededException;
 import com.bookshelf.search.SearchUnavailableException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -42,6 +43,13 @@ public class ApiExceptionHandler {
     @ExceptionHandler(ConflictException.class)
     ResponseEntity<ApiError> conflict(ConflictException e) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(new ApiError("CONFLICT", e.getMessage()));
+    }
+
+    @ExceptionHandler(UserQuotaExceededException.class)
+    ResponseEntity<ApiError> tooMany(UserQuotaExceededException e) {
+        log.debug("429 {}", e.getMessage());
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                .body(new ApiError("TOO_MANY_REQUESTS", "오늘은 검색을 너무 많이 했어요. 내일 다시 시도해 주세요"));
     }
 
     @ExceptionHandler({SearchUnavailableException.class, ProviderUnavailableException.class})

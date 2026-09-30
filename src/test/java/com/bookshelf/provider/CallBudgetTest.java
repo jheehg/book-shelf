@@ -39,7 +39,7 @@ class CallBudgetTest {
     }
 
     private CallBudget budgetAt(Instant now) {
-        return new CallBudget(jdbc, Clock.fixed(now, SEOUL));
+        return new CallBudget(jdbc, Clock.fixed(now, SEOUL), new UserQuotaProperties(300));
     }
 
     private static BudgetPolicy kakao(int dailyLimit, int backgroundCeiling) {

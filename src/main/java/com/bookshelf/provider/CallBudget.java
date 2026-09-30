@@ -1,5 +1,7 @@
 package com.bookshelf.provider;
 
+import com.bookshelf.common.ClockConfig;
+import com.bookshelf.common.CurrentMember;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Component;
@@ -24,10 +26,43 @@ public class CallBudget {
 
     private final JdbcClient jdbc;
     private final Clock clock;
+    private final UserQuotaProperties userQuota;
 
-    public CallBudget(JdbcClient jdbc, Clock clock) {
+    public CallBudget(JdbcClient jdbc, Clock clock, UserQuotaProperties userQuota) {
         this.jdbc = jdbc;
         this.clock = clock;
+        this.userQuota = userQuota;
+    }
+
+    /**
+     * 제공자를 실제로 부르기 직전에 부른다. 캐시에 걸린 요청은 여기까지 오지 않으므로 세지 않는다.
+     * 사람의 요청이면 사용자 상한부터 본다 — 상한을 넘은 요청이 제공자 예산을 깎지 않게.
+     */
+    public void acquire(BudgetPolicy policy, CallPurpose purpose) {
+        if (purpose == CallPurpose.INTERACTIVE) {
+            CurrentMember.id().ifPresent(this::acquireForMember);
+        }
+        if (!tryAcquire(policy, purpose)) {
+            throw new BudgetExhaustedException(policy.provider(), purpose);
+        }
+    }
+
+    private void acquireForMember(long memberId) {
+        List<Integer> after = jdbc.sql("""
+                INSERT INTO user_call_counter (member_id, day, calls) VALUES (:m, :day, 1)
+                ON CONFLICT (member_id, day) DO UPDATE SET calls = user_call_counter.calls + 1
+                WHERE user_call_counter.calls < :limit
+                RETURNING calls
+                """)
+                .param("m", memberId)
+                .param("day", LocalDate.ofInstant(clock.instant(), ClockConfig.SEOUL))
+                .param("limit", userQuota.dailyLimit())
+                .query(Integer.class)
+                .list();
+        if (after.isEmpty()) {
+            log.warn("사용자 {} 오늘 제공자 호출 상한({}) 초과", memberId, userQuota.dailyLimit());
+            throw new UserQuotaExceededException(memberId);
+        }
     }
 
     public boolean tryAcquire(BudgetPolicy policy, CallPurpose purpose) {

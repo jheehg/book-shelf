@@ -57,7 +57,7 @@ class KakaoBookCatalogTest {
         KakaoProperties props = new KakaoProperties("test-key", KakaoStub.baseUrl(), Duration.ofSeconds(1),
                 readTimeout, dailyLimit, dailyLimit, ZoneId.of("Asia/Seoul"), Duration.ofSeconds(60));
         RestClient rest = new KakaoRestClientConfig().kakaoRestClient(props, RestClient.builder());
-        return new KakaoBookCatalog(rest, new CallBudget(jdbc, clock), props, clock);
+        return new KakaoBookCatalog(rest, new CallBudget(jdbc, clock, new com.bookshelf.provider.UserQuotaProperties(300)), props, clock);
     }
 
     private KakaoBookCatalog catalog() {
