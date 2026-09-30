@@ -11,6 +11,9 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.json.JsonMapper;
+
 import java.time.Clock;
 
 /**
@@ -20,6 +23,8 @@ import java.time.Clock;
 @Slf4j
 @Component
 public class AppleTokenRevoker {
+
+    private static final JsonMapper JSON = JsonMapper.builder().build();
 
     /** Apple 응답의 나머지 필드(access_token, id_token 등)는 쓰지 않는다 */
     record TokenResponse(@JsonProperty("refresh_token") String refreshToken,
@@ -61,8 +66,15 @@ public class AppleTokenRevoker {
             return r;
         } catch (HttpClientErrorException e) {
             // 응답 본문(error 코드)만 남긴다. 코드와 secret은 로그에 남기지 않는다
-            log.info("Apple이 탈퇴 코드를 거부: {} {}", e.getStatusCode(), e.getResponseBodyAsString());
-            throw new AppleRejectedException("Apple이 코드를 거부했다: " + e.getStatusCode());
+            String error = errorCode(e.getResponseBodyAsString());
+            if ("invalid_grant".equals(error)) {
+                // 만료됐거나 이미 쓴 코드 — 앱이 Apple 인증을 다시 받아 오면 낫는다
+                log.info("Apple이 탈퇴 코드를 거부: {} {}", e.getStatusCode(), error);
+                throw new AppleRejectedException("Apple이 코드를 거부했다: " + error);
+            }
+            // invalid_client 등은 우리 설정(키·팀·번들 ID) 문제다. 다시 인증해도 낫지 않으니 운영자가 봐야 한다
+            log.error("Apple이 우리 클라이언트 설정을 거부: {} {} — APPLE_* 환경변수를 확인할 것", e.getStatusCode(), error);
+            throw new AppleUnavailableException("Apple 토큰 교환 거부: " + error, null);
         } catch (RestClientException e) {
             throw new AppleUnavailableException("Apple 토큰 교환 실패", e);
         }
@@ -81,6 +93,14 @@ public class AppleTokenRevoker {
         } catch (RestClientException e) {
             // 교환은 됐는데 철회가 안 됐다 — 연결이 남은 채 회원을 지우지 않는다
             throw new AppleUnavailableException("Apple 토큰 철회 실패", e);
+        }
+    }
+
+    private static String errorCode(String body) {
+        try {
+            return JSON.readTree(body).path("error").asString();
+        } catch (JacksonException e) {
+            return "";
         }
     }
 }

@@ -105,6 +105,13 @@ public final class AppleStub {
                         .withBody("{\"error\":\"invalid_grant\"}")));
     }
 
+    /** 우리 설정이 틀렸을 때(키·팀·클라이언트) Apple이 주는 오류 */
+    public static void exchangeFailsWith(String code, String error) {
+        SERVER.stubFor(post(urlPathEqualTo("/auth/token")).withFormParam("code", equalTo(code))
+                .willReturn(aResponse().withStatus(400).withHeader("Content-Type", "application/json")
+                        .withBody("{\"error\":\"" + error + "\"}")));
+    }
+
     public static void revokeOk() {
         SERVER.stubFor(post(urlPathEqualTo("/auth/revoke")).willReturn(ok()));
     }

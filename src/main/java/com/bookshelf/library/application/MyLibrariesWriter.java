@@ -1,5 +1,6 @@
 package com.bookshelf.library.application;
 
+import com.bookshelf.member.application.ActiveMemberLock;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,9 +14,11 @@ public class MyLibrariesWriter {
     static final int MAX_CHANGES_PER_DAY = 3;
 
     private final JdbcClient jdbc;
+    private final ActiveMemberLock memberLock;
 
-    public MyLibrariesWriter(JdbcClient jdbc) {
+    public MyLibrariesWriter(JdbcClient jdbc, ActiveMemberLock memberLock) {
         this.jdbc = jdbc;
+        this.memberLock = memberLock;
     }
 
     public List<String> current(long memberId) {
@@ -29,6 +32,7 @@ public class MyLibrariesWriter {
      */
     @Transactional
     public void replace(long memberId, List<String> libCodes, LocalDate today) {
+        memberLock.lock(memberId);   // 탈퇴와 겹치면 등록이 고아로 남지 않게
         if (current(memberId).equals(libCodes)) {
             return;
         }

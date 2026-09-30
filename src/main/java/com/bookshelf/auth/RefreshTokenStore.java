@@ -60,7 +60,14 @@ public class RefreshTokenStore {
      */
     @Transactional(noRollbackFor = UnauthorizedException.class)
     public Rotated rotate(String raw, Instant now) {
-        Row row = jdbc.sql("SELECT id, member_id, expires_at, used_at FROM refresh_token WHERE token_hash = :h FOR UPDATE")
+        // 회원 행도 함께 잠근다(FOR UPDATE는 조인한 두 행을 모두 잠근다) — 탈퇴(MemberDeletion)와 줄을 세워
+        // 탈퇴가 끝난 뒤 새 refresh가 남지 않게. 탈퇴한 회원의 토큰은 모르는 토큰과 같다
+        Row row = jdbc.sql("""
+                        SELECT t.id, t.member_id, t.expires_at, t.used_at
+                        FROM refresh_token t JOIN member m ON m.id = t.member_id
+                        WHERE t.token_hash = :h AND m.deleted_at IS NULL
+                        FOR UPDATE
+                        """)
                 .param("h", hash(raw))
                 .query((rs, n) -> new Row(rs.getLong("id"), rs.getLong("member_id"),
                         rs.getObject("expires_at", OffsetDateTime.class).toInstant(),

@@ -3,6 +3,7 @@ package com.bookshelf.record.application;
 import com.bookshelf.common.ConflictException;
 import com.bookshelf.common.Isbn13;
 import com.bookshelf.common.NotFoundException;
+import com.bookshelf.member.application.ActiveMemberLock;
 import com.bookshelf.member.domain.Member;
 import com.bookshelf.record.domain.ReadingRecord;
 import com.bookshelf.record.domain.ReadingStatus;
@@ -23,13 +24,16 @@ public class RecordWriter {
     }
 
     private final ReadingRecordRepository records;
+    private final ActiveMemberLock memberLock;
 
-    public RecordWriter(ReadingRecordRepository records) {
+    public RecordWriter(ReadingRecordRepository records, ActiveMemberLock memberLock) {
         this.records = records;
+        this.memberLock = memberLock;
     }
 
     @Transactional
     public ReadingRecord create(Member member, Isbn13 isbn, ReadingStatus status, Instant now) {
+        memberLock.lock(member.getId());   // 탈퇴와 겹치면 기록이 고아로 남지 않게
         if (records.existsByMemberIdAndIsbn13(member.getId(), isbn.value())) {
             throw new ConflictException("이미 기록한 책이에요");
         }

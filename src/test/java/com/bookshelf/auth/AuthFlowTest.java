@@ -37,6 +37,7 @@ class AuthFlowTest {
     @Autowired MockMvc mvc;
     @Autowired JdbcClient jdbc;
     @Autowired ObjectMapper json;
+    @Autowired org.springframework.security.oauth2.jwt.JwtEncoder encoder;
 
     @BeforeEach
     void setUp() {
@@ -162,5 +163,30 @@ class AuthFlowTest {
                 .query(Integer.class).single()).isZero();
         assertThat(jdbc.sql("SELECT count(*) FROM refresh_token WHERE token_hash = :h")
                 .param("h", AppleStub.sha256Hex(r1)).query(Integer.class).single()).isEqualTo(1);
+    }
+
+    /** 앱은 저장된 access 토큰을 모든 요청에 붙인다. 만료된 토큰이 붙어 있어도 refresh는 되어야 한다 (리뷰 I1) */
+    @Test
+    void 만료된_access_토큰을_달고_와도_refresh와_로그인은_된다() throws Exception {
+        String r1 = body(login(SUB, "주희")).get("refreshToken").asString();
+        java.time.Instant past = java.time.Instant.now().minusSeconds(3600);
+        String expired = encoder.encode(org.springframework.security.oauth2.jwt.JwtEncoderParameters.from(
+                org.springframework.security.oauth2.jwt.JwsHeader.with(org.springframework.security.oauth2.jose.jws.MacAlgorithm.HS256).build(),
+                org.springframework.security.oauth2.jwt.JwtClaimsSet.builder().issuer("book-shelf").subject("1")
+                        .issuedAt(past.minusSeconds(60)).expiresAt(past).build())).getTokenValue();
+
+        MvcResult r = mvc.perform(post("/api/auth/refresh").header("Authorization", "Bearer " + expired)
+                .contentType(MediaType.APPLICATION_JSON).content("{\"refreshToken\":\"" + r1 + "\"}")).andReturn();
+
+        assertThat(r.getResponse().getStatus()).isEqualTo(200);
+    }
+
+    /** 탈퇴와 refresh가 겹쳐 refresh 행이 남았더라도, 탈퇴한 회원의 refresh는 통하지 않는다 (리뷰 I2) */
+    @Test
+    void 탈퇴한_회원의_refresh는_401이다() throws Exception {
+        String r1 = body(login(SUB, "주희")).get("refreshToken").asString();
+        jdbc.sql("UPDATE member SET deleted_at = now()").update();
+
+        assertThat(refresh(r1).getResponse().getStatus()).isEqualTo(401);
     }
 }

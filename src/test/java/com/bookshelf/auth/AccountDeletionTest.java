@@ -206,4 +206,15 @@ class AccountDeletionTest {
         assertThat(AppleStub.calls("/auth/token")).isZero();
         assertThat(count("reading_record")).isEqualTo(1);
     }
+
+    /** invalid_client는 사용자가 다시 인증해도 낫지 않는다 — 우리 설정 문제다. 503이고 아무것도 지우지 않는다 (리뷰 I3) */
+    @Test
+    void Apple이_우리_설정을_거부하면_503이고_아무것도_지우지_않는다() throws Exception {
+        AppleStub.exchangeFailsWith(CODE, "invalid_client");
+
+        deleteAccount("{\"authorizationCode\":\"" + CODE + "\"}").andExpect(status().isServiceUnavailable());
+
+        assertThat(count("reading_record")).isEqualTo(1);
+        assertThat(AppleStub.calls("/auth/revoke")).isZero();
+    }
 }

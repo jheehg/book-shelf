@@ -28,6 +28,9 @@ public class MemberDeletion {
 
     @Transactional
     public void delete(long memberId, Instant now) {
+        // 회원 행을 먼저 잠근다. 진행 중인 refresh 회전·기록 생성·도서관 변경(모두 이 행을 잠근다)이 끝난 뒤에 지우고,
+        // 탈퇴가 끝난 뒤에 시작된 것은 deleted_at을 보고 멈춘다
+        jdbc.sql("SELECT id FROM member WHERE id = :m FOR UPDATE").param("m", memberId).query(Long.class).single();
         for (String table : OWNED_TABLES) {
             jdbc.sql("DELETE FROM " + table + " WHERE member_id = :m").param("m", memberId).update();
         }

@@ -4,6 +4,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.server.resource.web.BearerTokenResolver;
+import org.springframework.security.oauth2.server.resource.web.DefaultBearerTokenResolver;
 import org.springframework.security.web.SecurityFilterChain;
 
 /**
@@ -15,7 +17,8 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     @Bean
-    SecurityFilterChain filterChain(HttpSecurity http, ApiAuthenticationEntryPoint entryPoint) throws Exception {
+    SecurityFilterChain filterChain(HttpSecurity http, ApiAuthenticationEntryPoint entryPoint,
+                                    ActiveMemberJwtConverter activeMember) throws Exception {
         return http
                 .csrf(c -> c.disable())
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -23,8 +26,27 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/**").authenticated()
                         .anyRequest().permitAll())
-                .oauth2ResourceServer(o -> o.jwt(j -> { }).authenticationEntryPoint(entryPoint))
+                .oauth2ResourceServer(o -> o
+                        .bearerTokenResolver(apiTokensOnly())
+                        .jwt(j -> j.jwtAuthenticationConverter(activeMember))
+                        .authenticationEntryPoint(entryPoint))
                 .exceptionHandling(e -> e.authenticationEntryPoint(entryPoint))
                 .build();
+    }
+
+    /**
+     * Bearer 헤더를 읽는 곳을 인증이 필요한 /api로 한정한다. 스프링은 permitAll 경로에서도 헤더가 있으면
+     * 검증해 401을 낸다 — 앱은 저장된 access 토큰을 모든 요청에 붙이므로, 만료된 토큰 때문에
+     * /api/auth/refresh 자체가 막혀 30분마다 로그아웃된다.
+     */
+    static BearerTokenResolver apiTokensOnly() {
+        DefaultBearerTokenResolver header = new DefaultBearerTokenResolver();
+        return request -> {
+            String path = request.getRequestURI().substring(request.getContextPath().length());
+            if (!path.startsWith("/api/") || path.startsWith("/api/auth/")) {
+                return null;
+            }
+            return header.resolve(request);
+        };
     }
 }
