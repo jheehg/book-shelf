@@ -52,6 +52,26 @@ public final class LibraryStub {
         SERVER.stubFor(any(urlPathMatching("/api/.*")).willReturn(aResponse().withStatus(status)));
     }
 
+    /** 다른 libSrch 스텁에 걸리지 않은 요청의 응답(우선순위가 낮다) */
+    public static void librariesDefault(String body) {
+        SERVER.stubFor(get(urlPathEqualTo("/api/libSrch")).atPriority(10).willReturn(okJson(body)));
+    }
+
+    /** 도서관 n곳짜리 libSrch 응답. 코드는 prefix + 번호 */
+    public static String librariesBody(String prefix, int n) {
+        StringBuilder libs = new StringBuilder();
+        for (int i = 0; i < n; i++) {
+            if (i > 0) {
+                libs.append(',');
+            }
+            libs.append("{\"lib\":{\"libCode\":\"").append(prefix).append(i)
+                    .append("\",\"libName\":\"").append(prefix).append(" 도서관 ").append(i)
+                    .append("\",\"address\":\"주소 ").append(i)
+                    .append("\",\"tel\":\"02-000-0000\",\"latitude\":\"37.5\",\"longitude\":\"127.0\",\"homepage\":\"\"}}");
+        }
+        return "{\"response\":{\"numFound\":" + n + ",\"resultNum\":" + n + ",\"libs\":[" + libs + "]}}";
+    }
+
     public static String holdingBody(String hasBook, String loanAvailable) {
         return "{\"response\":{\"result\":{\"hasBook\":\"" + hasBook + "\",\"loanAvailable\":\"" + loanAvailable + "\"}}}";
     }
