@@ -80,6 +80,18 @@ public class Member {
         this.displayName = name;
     }
 
+    static final String ERASED_NAME = "탈퇴한 회원";
+
+    /**
+     * 탈퇴. slug는 남긴다 — 옛 공개 서재 링크를 다른 사람이 이어받지 못하게(설계 결정).
+     * Apple 식별자를 지워 같은 Apple 계정의 다음 로그인은 새 회원이 된다.
+     */
+    public void erase(Instant now) {
+        withdraw(now);
+        this.displayName = ERASED_NAME;
+        this.appleSub = null;
+    }
+
     public boolean isDeleted() {
         return deletedAt != null;
     }

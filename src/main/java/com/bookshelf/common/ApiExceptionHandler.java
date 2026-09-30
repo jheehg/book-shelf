@@ -2,6 +2,8 @@ package com.bookshelf.common;
 
 import com.bookshelf.auth.ApiAuthenticationEntryPoint;
 import com.bookshelf.auth.UnauthorizedException;
+import com.bookshelf.auth.apple.AppleRejectedException;
+import com.bookshelf.auth.apple.AppleUnavailableException;
 import com.bookshelf.provider.ProviderUnavailableException;
 import com.bookshelf.provider.UserQuotaExceededException;
 import com.bookshelf.search.SearchUnavailableException;
@@ -66,6 +68,18 @@ public class ApiExceptionHandler {
     ResponseEntity<ApiError> integrity(DataIntegrityViolationException e) {
         log.debug("409 {}", e.getMostSpecificCause().getMessage());
         return ResponseEntity.status(HttpStatus.CONFLICT).body(new ApiError("CONFLICT", "이미 있어요"));
+    }
+
+    @ExceptionHandler(AppleRejectedException.class)
+    ResponseEntity<ApiError> appleRejected(AppleRejectedException e) {
+        return ResponseEntity.badRequest().body(new ApiError("APPLE_REAUTH", "Apple 인증을 다시 해 주세요"));
+    }
+
+    @ExceptionHandler(AppleUnavailableException.class)
+    ResponseEntity<ApiError> appleDown(AppleUnavailableException e) {
+        log.warn("503 {}", e.getMessage());
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                .body(new ApiError("TRY_LATER", "잠시 후 다시 시도해 주세요"));
     }
 
     @ExceptionHandler(UserQuotaExceededException.class)

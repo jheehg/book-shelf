@@ -36,6 +36,9 @@ apple:
   private-key: ${APPLE_PRIVATE_KEY}      # .p8 내용, 줄바꿈은 | 로 (환경변수 한 줄에 담기 위해)
   auth-base-url: ${APPLE_AUTH_BASE_URL:https://appleid.apple.com}
   jwks-uri: ${APPLE_JWKS_URI:https://appleid.apple.com/auth/keys}
+  # Apple 토큰 교환·철회. 탈퇴 때만 부른다 — 사람이 기다린다
+  connect-timeout: 2s
+  read-timeout: 5s
 
 providers:
   user:

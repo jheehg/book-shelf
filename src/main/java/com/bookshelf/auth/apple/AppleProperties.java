@@ -2,9 +2,11 @@ package com.bookshelf.auth.apple;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import java.time.Duration;
+
 @ConfigurationProperties("apple")
 public record AppleProperties(String clientId, String teamId, String keyId, String privateKey,
-                              String authBaseUrl, String jwksUri) {
+                              String authBaseUrl, String jwksUri, Duration connectTimeout, Duration readTimeout) {
 
     public AppleProperties {
         require(clientId, "APPLE_CLIENT_ID");

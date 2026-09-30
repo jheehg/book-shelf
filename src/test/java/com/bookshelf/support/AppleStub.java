@@ -12,12 +12,17 @@ import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 
+import com.github.tomakehurst.wiremock.verification.LoggedRequest;
+
+import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.util.HexFormat;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
@@ -84,6 +89,52 @@ public final class AppleStub {
         } catch (NoSuchAlgorithmException e) {
             throw new IllegalStateException(e);
         }
+    }
+
+    /** 이 코드로 교환하면 이 refresh 토큰을 준다 */
+    public static void exchangeReturns(String code, String refreshToken) {
+        SERVER.stubFor(post(urlPathEqualTo("/auth/token")).withFormParam("code", equalTo(code))
+                .willReturn(okJson("{\"access_token\":\"at\",\"token_type\":\"Bearer\",\"expires_in\":3600,"
+                        + "\"refresh_token\":\"" + refreshToken + "\",\"id_token\":\"x\"}")));
+    }
+
+    /** 만료됐거나 이미 쓴 코드 — Apple은 400 invalid_grant를 준다 */
+    public static void exchangeRejects(String code) {
+        SERVER.stubFor(post(urlPathEqualTo("/auth/token")).withFormParam("code", equalTo(code))
+                .willReturn(aResponse().withStatus(400).withHeader("Content-Type", "application/json")
+                        .withBody("{\"error\":\"invalid_grant\"}")));
+    }
+
+    public static void revokeOk() {
+        SERVER.stubFor(post(urlPathEqualTo("/auth/revoke")).willReturn(ok()));
+    }
+
+    public static void revokeFails(int status) {
+        SERVER.stubFor(post(urlPathEqualTo("/auth/revoke")).willReturn(aResponse().withStatus(status)));
+    }
+
+    public static void appleDown() {
+        SERVER.stubFor(post(urlPathEqualTo("/auth/token")).willReturn(aResponse().withStatus(503)));
+        SERVER.stubFor(post(urlPathEqualTo("/auth/revoke")).willReturn(aResponse().withStatus(503)));
+    }
+
+    public static int calls(String path) {
+        return SERVER.findAll(postRequestedFor(urlPathEqualTo(path))).size();
+    }
+
+    /** 그 경로로 온 마지막 요청의 form 본문 */
+    public static Map<String, String> formOf(String path) {
+        List<LoggedRequest> all = SERVER.findAll(postRequestedFor(urlPathEqualTo(path)));
+        if (all.isEmpty()) {
+            throw new AssertionError(path + "로 온 요청이 없다");
+        }
+        Map<String, String> form = new LinkedHashMap<>();
+        for (String pair : all.getLast().getBodyAsString().split("&")) {
+            String[] kv = pair.split("=", 2);
+            form.put(URLDecoder.decode(kv[0], StandardCharsets.UTF_8),
+                    kv.length == 2 ? URLDecoder.decode(kv[1], StandardCharsets.UTF_8) : "");
+        }
+        return form;
     }
 
     private static String sign(RSAKey key, String issuer, String sub, String aud, String rawNonce, Instant expiresAt) {

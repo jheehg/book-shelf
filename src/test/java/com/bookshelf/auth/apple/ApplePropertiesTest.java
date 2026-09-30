@@ -4,6 +4,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import java.time.Duration;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -11,7 +13,7 @@ class ApplePropertiesTest {
 
     private static AppleProperties with(String clientId, String privateKey) {
         return new AppleProperties(clientId, "TEAM", "KEY", privateKey, "https://appleid.apple.com",
-                "https://appleid.apple.com/auth/keys");
+                "https://appleid.apple.com/auth/keys", Duration.ofSeconds(2), Duration.ofSeconds(5));
     }
 
     @ParameterizedTest
