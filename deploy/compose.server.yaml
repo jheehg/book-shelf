@@ -1,0 +1,60 @@
+# 볼륨·컨테이너 이름 접두어를 고정한다(기본값은 디렉터리 이름 "deploy"라 헷갈린다)
+name: bookshelf
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: bookshelf-postgres
+    environment:
+      POSTGRES_DB: bookshelf
+      POSTGRES_USER: bookshelf
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD를 지정해야 한다}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    # 포트를 퍼블리시하지 않는다. Docker의 -p 포트 공개는 호스트 방화벽(iptables INPUT)을 거치지 않아 DB가 인터넷에 열린다. 접속은 SSH 터널로
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bookshelf -d bookshelf"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+    mem_limit: 256m
+
+  app:
+    # 서버에서 빌드하지 않는다. 맥에서 amd64로 크로스 빌드해 docker load 한다 (README 3절)
+    image: bookshelf-app:amd64
+    container_name: bookshelf-app
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/bookshelf
+      DB_USERNAME: bookshelf
+      DB_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD를 지정해야 한다}
+      KAKAO_REST_API_KEY: ${KAKAO_REST_API_KEY:?KAKAO_REST_API_KEY를 지정해야 한다}
+      SITE_URL: "${SITE_URL:?SITE_URL을 지정해야 한다 (예 https://example.com)}"   # 따옴표: 값 안의 ": "를 YAML이 키로 읽는다
+      # 평소에는 비워 둔다. 카카오 장애를 흉내 낼 때만 덮는다 (deploy/README.md)
+      KAKAO_BASE_URL: ${KAKAO_BASE_URL:-https://dapi.kakao.com}
+    mem_limit: 512m
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: bookshelf-nginx
+    depends_on:
+      - app
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      # 인증서 발급 전에는 NGINX_CONF=./nginx.http.conf 로 띄운다 (README 4절)
+      - ${NGINX_CONF:-./nginx.conf}:/etc/nginx/conf.d/default.conf:ro
+      - certbot-webroot:/var/www/certbot:ro
+      - certbot-conf:/etc/letsencrypt:ro
+    restart: unless-stopped
+    mem_limit: 64m
+
+volumes:
+  postgres-data:
+  certbot-webroot:
+  certbot-conf:
