@@ -31,8 +31,8 @@ class StoreLinksTest {
                 .get(EBOOK).getFirst().url();
 
         assertThat(url).isEqualTo("https://ridi.example/search?q="
-                + "%ED%95%B4%EB%A6%AC+%ED%8F%AC%ED%84%B0%EC%99%80+%EB%A7%88%EB%B2%95%EC%82%AC%EC%9D%98+%EB%8F%8C+1"
-                + "+%EC%A1%B0%EC%95%A4+K.+%EB%A1%A4%EB%A7%81");
+                + "%ED%95%B4%EB%A6%AC%20%ED%8F%AC%ED%84%B0%EC%99%80%20%EB%A7%88%EB%B2%95%EC%82%AC%EC%9D%98%20%EB%8F%8C%201"
+                + "+%EC%A1%B0%EC%95%A4%20K.%20%EB%A1%A4%EB%A7%81");   // 제목·저자 안의 공백은 %20, 둘 사이의 +는 템플릿의 것
     }
 
     @Test
@@ -40,7 +40,17 @@ class StoreLinksTest {
         StoreLinks l = links(new StoreLinksProperties.Entry(EBOOK, "리디", "https://ridi.example/search?q={title}+{author}"));
 
         assertThat(l.forBook("9788936434120", "소년이 온다", null).get(EBOOK).getFirst().url())
-                .isEqualTo("https://ridi.example/search?q=%EC%86%8C%EB%85%84%EC%9D%B4+%EC%98%A8%EB%8B%A4");
+                .isEqualTo("https://ridi.example/search?q=%EC%86%8C%EB%85%84%EC%9D%B4%20%EC%98%A8%EB%8B%A4");
+    }
+
+    /** 밀리의서재는 검색어가 쿼리가 아니라 경로에 들어간다. 경로에서 +는 공백이 아니라 글자 그대로의 +다 */
+    @Test
+    void 검색어가_주소_경로에_들어가도_공백이_깨지지_않는다() {
+        StoreLinks l = links(new StoreLinksProperties.Entry(EBOOK, "밀리의서재",
+                "https://millie.example/v3/search/result/{title}?type=total"));
+
+        assertThat(l.forBook("9788936434120", "소년이 온다", "한강").get(EBOOK).getFirst().url())
+                .isEqualTo("https://millie.example/v3/search/result/%EC%86%8C%EB%85%84%EC%9D%B4%20%EC%98%A8%EB%8B%A4?type=total");
     }
 
     @Test

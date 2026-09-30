@@ -68,7 +68,11 @@ public class StoreLinks {
         return author.split(",")[0].strip();
     }
 
+    /**
+     * 공백은 %20으로. URLEncoder는 공백을 +로 바꾸는데, 쿼리에서는 +가 공백이지만
+     * 주소 경로(밀리의서재 /search/result/{title})에서는 글자 그대로의 +다. %20은 둘 다에서 공백이다.
+     */
     private static String encode(String s) {
-        return URLEncoder.encode(s, StandardCharsets.UTF_8);
+        return URLEncoder.encode(s, StandardCharsets.UTF_8).replace("+", "%20");
     }
 }
