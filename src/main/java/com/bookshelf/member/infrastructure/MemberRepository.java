@@ -10,4 +10,6 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     Optional<Member> findByAppleSub(String appleSub);
 
     boolean existsBySlug(String slug);
+
+    Optional<Member> findBySlug(String slug);
 }

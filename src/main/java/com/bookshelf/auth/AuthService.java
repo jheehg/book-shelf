@@ -45,6 +45,20 @@ public class AuthService {
         return issue(member.getId(), now, existing.isEmpty());
     }
 
+    /**
+     * 로컬 전용 개발 로그인(DevLoginController가 켜졌을 때만 불린다). 그 slug의 회원이 없으면 만든다.
+     * Apple 연결이 없는 회원이 된다 — 탈퇴할 때 Apple 철회를 건너뛴다(AccountDeletionService).
+     */
+    public AuthTokens loginAsDev(String slug) {
+        Instant now = clock.instant();
+        Optional<Member> existing = slug == null ? Optional.empty() : members.findBySlug(slug);
+        if (existing.isPresent() && existing.get().isDeleted()) {
+            throw new UnauthorizedException("탈퇴한 회원으로 개발 로그인: " + slug);
+        }
+        Member member = existing.orElseGet(() -> members.save(Member.register(slug, slug, now)));
+        return issue(member.getId(), now, existing.isEmpty());
+    }
+
     public AuthTokens refresh(String raw) {
         if (raw == null || raw.isBlank()) {
             throw new UnauthorizedException("refresh 토큰 없음");

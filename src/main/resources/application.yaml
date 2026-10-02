@@ -69,6 +69,9 @@ providers:
 
 bookshelf:
   site-url: ${SITE_URL:http://localhost:8080}
+  # 로컬 전용 개발 로그인 (POST /api/auth/dev). 배포에서는 두지 않는다 — 켜도 site-url이 로컬이 아니면 기동 실패
+  dev-login:
+    enabled: ${DEV_LOGIN_ENABLED:false}
   sale-ttl: 6h
   search-cache-ttl: 24h
   background:

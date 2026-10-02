@@ -23,5 +23,7 @@
 ```bash
 docker compose up -d        # Postgres (5433). 최초 1회 bookshelf_test DB도 만든다
 set -a && . ./.env && set +a && ./gradlew bootRun
+# 앱 개발용: Apple 로그인 대신 POST /api/auth/dev {"slug":"dev-me"} (로컬 전용), 외부 호출을 아끼려면 백그라운드 작업은 끈다
+set -a && . ./.env && set +a && DEV_LOGIN_ENABLED=true BACKGROUND_JOBS_ENABLED=false ./gradlew bootRun
 ./gradlew test
 ```
