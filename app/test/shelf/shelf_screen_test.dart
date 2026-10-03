@@ -79,6 +79,15 @@ void main() {
     );
   });
 
+  testWidgets('서재에서 내 도서관 관리 화면으로 이동할 수 있다', (tester) async {
+    await pumpApp(tester, FakeApi(), initialLocation: '/');
+
+    await tester.tap(find.byTooltip('내 도서관'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('내 도서관 0/3'), findsOneWidget);
+  });
+
   testWidgets('읽기 상태로 거른다', (tester) async {
     await pumpApp(tester, api);
     await tester.tap(find.widgetWithText(ChoiceChip, '읽고 싶다'));
