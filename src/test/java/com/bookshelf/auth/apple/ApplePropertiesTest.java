@@ -1,5 +1,7 @@
 package com.bookshelf.auth.apple;
 
+import com.bookshelf.auth.infrastructure.provider.apple.AppleProperties;
+
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;

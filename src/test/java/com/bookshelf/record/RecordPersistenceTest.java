@@ -1,9 +1,9 @@
 package com.bookshelf.record;
 
-import com.bookshelf.book.infrastructure.BookRepository;
+import com.bookshelf.book.infrastructure.persistence.BookRepository;
 import com.bookshelf.member.domain.Member;
 import com.bookshelf.record.domain.Visibility;
-import com.bookshelf.record.infrastructure.ReadingRecordRepository;
+import com.bookshelf.record.infrastructure.persistence.ReadingRecordRepository;
 import com.bookshelf.support.DbCleaner;
 import com.bookshelf.support.Fixtures;
 import org.junit.jupiter.api.BeforeEach;

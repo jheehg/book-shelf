@@ -1,12 +1,14 @@
 package com.bookshelf.library.application;
 
+import com.bookshelf.library.infrastructure.persistence.HoldingCache;
+
 import com.bookshelf.common.Isbn13;
-import com.bookshelf.library.HoldingState;
-import com.bookshelf.library.LibraryAvailability;
+import com.bookshelf.library.domain.HoldingState;
+import com.bookshelf.library.domain.LibraryAvailability;
 import com.bookshelf.member.application.MemberService;
-import com.bookshelf.provider.CallPurpose;
-import com.bookshelf.provider.ProviderUnavailableException;
-import com.bookshelf.provider.UserQuotaExceededException;
+import com.bookshelf.provider.domain.CallPurpose;
+import com.bookshelf.provider.domain.ProviderUnavailableException;
+import com.bookshelf.provider.domain.UserQuotaExceededException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 

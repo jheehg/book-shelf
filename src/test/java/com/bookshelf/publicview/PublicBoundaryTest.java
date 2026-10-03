@@ -1,5 +1,16 @@
 package com.bookshelf.publicview;
 
+import com.bookshelf.publicview.application.PublicEntry;
+import com.bookshelf.publicview.application.PublicBook;
+import com.bookshelf.publicview.application.PublicReview;
+import com.bookshelf.publicview.application.PublicShelf;
+import com.bookshelf.publicview.application.RatedEntry;
+import com.bookshelf.publicview.application.ReviewedEntry;
+import com.bookshelf.publicview.infrastructure.persistence.PublicBookQuery;
+import com.bookshelf.publicview.infrastructure.persistence.PublicShelfQuery;
+import com.bookshelf.publicview.infrastructure.persistence.SitemapQuery;
+import com.bookshelf.record.domain.Visibility;
+
 import com.bookshelf.common.Isbn13;
 import com.bookshelf.member.domain.Member;
 import com.bookshelf.support.DbCleaner;
@@ -169,11 +180,11 @@ class PublicBoundaryTest {
         assertThat(sitemap.bookIsbns()).doesNotContain(C, CLOSED_ONLY, GONE_ONLY);
     }
 
-    /** 공개 조회 SQL이 등록 도서관·소장 캐시 테이블을 읽지 않는다. SQL은 모두 publicview 패키지의 소스에 있다 */
+    /** 공개 조회 SQL이 등록 도서관·소장 캐시 테이블을 읽지 않는다. */
     @Test
     void 공개_조회_SQL은_도서관_테이블을_읽지_않는다() throws Exception {
-        try (var files = java.nio.file.Files.list(java.nio.file.Path.of("src/main/java/com/bookshelf/publicview"))) {
-            for (var file : files.toList()) {
+        try (var files = java.nio.file.Files.walk(java.nio.file.Path.of("src/main/java/com/bookshelf/publicview"))) {
+            for (var file : files.filter(path -> path.toString().endsWith(".java")).toList()) {
                 String src = java.nio.file.Files.readString(file);
                 assertThat(src).as(file.toString()).doesNotContain("member_library").doesNotContain("library_holding");
             }

@@ -1,14 +1,14 @@
 package com.bookshelf.book.application;
 
-import com.bookshelf.book.infrastructure.RefreshQueue;
-import com.bookshelf.book.infrastructure.SaleSnapshotRepository;
-import com.bookshelf.catalog.BookCatalog;
-import com.bookshelf.catalog.CatalogBook;
+import com.bookshelf.book.infrastructure.persistence.RefreshQueue;
+import com.bookshelf.book.infrastructure.persistence.SaleSnapshotRepository;
+import com.bookshelf.book.application.catalog.BookCatalog;
+import com.bookshelf.book.application.catalog.CatalogBook;
 import com.bookshelf.common.BookshelfProperties;
 import com.bookshelf.common.Isbn13;
-import com.bookshelf.provider.BudgetExhaustedException;
-import com.bookshelf.provider.CallPurpose;
-import com.bookshelf.provider.ProviderUnavailableException;
+import com.bookshelf.provider.domain.BudgetExhaustedException;
+import com.bookshelf.provider.domain.CallPurpose;
+import com.bookshelf.provider.domain.ProviderUnavailableException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 

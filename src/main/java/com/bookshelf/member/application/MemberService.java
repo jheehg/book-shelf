@@ -1,9 +1,9 @@
 package com.bookshelf.member.application;
 
-import com.bookshelf.auth.UnauthorizedException;
+import com.bookshelf.auth.application.UnauthorizedException;
 import com.bookshelf.common.ConflictException;
 import com.bookshelf.member.domain.Member;
-import com.bookshelf.member.infrastructure.MemberRepository;
+import com.bookshelf.member.infrastructure.persistence.MemberRepository;
 import com.bookshelf.record.domain.Visibility;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

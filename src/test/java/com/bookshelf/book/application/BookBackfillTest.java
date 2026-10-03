@@ -1,7 +1,7 @@
 package com.bookshelf.book.application;
 
-import com.bookshelf.book.infrastructure.BookLookupFailureRepository;
-import com.bookshelf.book.infrastructure.BookRepository;
+import com.bookshelf.book.infrastructure.persistence.BookLookupFailureRepository;
+import com.bookshelf.book.infrastructure.persistence.BookRepository;
 import com.bookshelf.member.domain.Member;
 import com.bookshelf.record.domain.Visibility;
 import com.bookshelf.support.DbCleaner;

@@ -1,14 +1,16 @@
 package com.bookshelf.record.application;
 
+import com.bookshelf.common.DomainException;
+
 import com.bookshelf.common.ConflictException;
 import com.bookshelf.common.Isbn13;
 import com.bookshelf.common.NotFoundException;
-import com.bookshelf.member.application.ActiveMemberLock;
+import com.bookshelf.member.infrastructure.persistence.ActiveMemberLock;
 import com.bookshelf.member.domain.Member;
 import com.bookshelf.record.domain.ReadingRecord;
 import com.bookshelf.record.domain.ReadingStatus;
 import com.bookshelf.record.domain.Visibility;
-import com.bookshelf.record.infrastructure.ReadingRecordRepository;
+import com.bookshelf.record.infrastructure.persistence.ReadingRecordRepository;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 

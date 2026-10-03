@@ -1,13 +1,15 @@
 package com.bookshelf.book.application;
 
+import com.bookshelf.provider.domain.CallPurpose;
+
 import com.bookshelf.book.domain.BookLookupFailure;
 import com.bookshelf.book.domain.SaleStatus;
-import com.bookshelf.book.infrastructure.BookLookupFailureRepository;
-import com.bookshelf.book.infrastructure.BookRepository;
-import com.bookshelf.book.infrastructure.SaleSnapshotRepository;
-import com.bookshelf.catalog.CatalogBook;
+import com.bookshelf.book.infrastructure.persistence.BookLookupFailureRepository;
+import com.bookshelf.book.infrastructure.persistence.BookRepository;
+import com.bookshelf.book.infrastructure.persistence.SaleSnapshotRepository;
+import com.bookshelf.book.application.catalog.CatalogBook;
 import com.bookshelf.common.Isbn13;
-import com.bookshelf.provider.ProviderUnavailableException;
+import com.bookshelf.provider.domain.ProviderUnavailableException;
 import com.bookshelf.support.DbCleaner;
 import com.bookshelf.support.Fixtures;
 import com.bookshelf.support.KakaoStub;
@@ -22,7 +24,7 @@ import org.springframework.test.context.DynamicPropertySource;
 
 import java.time.Instant;
 
-import static com.bookshelf.provider.CallPurpose.INTERACTIVE;
+import static com.bookshelf.provider.domain.CallPurpose.INTERACTIVE;
 import static com.bookshelf.support.KakaoStub.doc;
 import static com.bookshelf.support.KakaoStub.response;
 import static org.assertj.core.api.Assertions.assertThat;

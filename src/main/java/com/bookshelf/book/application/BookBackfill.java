@@ -2,14 +2,13 @@ package com.bookshelf.book.application;
 
 import com.bookshelf.common.BookshelfProperties;
 import com.bookshelf.common.Isbn13;
-import com.bookshelf.provider.BudgetExhaustedException;
-import com.bookshelf.provider.CallPurpose;
-import com.bookshelf.provider.ProviderUnavailableException;
+import com.bookshelf.book.infrastructure.persistence.BookBackfillCandidates;
+import com.bookshelf.provider.domain.BudgetExhaustedException;
+import com.bookshelf.provider.domain.CallPurpose;
+import com.bookshelf.provider.domain.ProviderUnavailableException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Component;
 
-import java.sql.Timestamp;
 import java.time.Clock;
 import java.util.List;
 import java.util.Optional;
@@ -19,15 +18,15 @@ import java.util.Optional;
 @Component
 public class BookBackfill {
 
-    private final JdbcClient jdbc;
+    private final BookBackfillCandidates candidates;
     private final BookLookupService lookup;
     private final BookWriter writer;
     private final BookshelfProperties props;
     private final Clock clock;
 
-    public BookBackfill(JdbcClient jdbc, BookLookupService lookup, BookWriter writer,
+    public BookBackfill(BookBackfillCandidates candidates, BookLookupService lookup, BookWriter writer,
                         BookshelfProperties props, Clock clock) {
-        this.jdbc = jdbc;
+        this.candidates = candidates;
         this.lookup = lookup;
         this.writer = writer;
         this.props = props;
@@ -35,19 +34,7 @@ public class BookBackfill {
     }
 
     public int runOnce() {
-        List<String> pending = jdbc.sql("""
-                SELECT DISTINCT r.isbn13
-                FROM reading_record r
-                LEFT JOIN book b                ON b.isbn13 = r.isbn13
-                LEFT JOIN book_lookup_failure f ON f.isbn13 = r.isbn13
-                WHERE b.isbn13 IS NULL
-                  AND (f.isbn13 IS NULL OR f.next_try_at <= :now)
-                LIMIT :n
-                """)
-                .param("now", Timestamp.from(clock.instant()))
-                .param("n", props.background().backfillBatchSize())
-                .query(String.class)
-                .list();
+        List<String> pending = candidates.findPending(clock.instant(), props.background().backfillBatchSize());
 
         int filled = 0;
         for (String raw : pending) {

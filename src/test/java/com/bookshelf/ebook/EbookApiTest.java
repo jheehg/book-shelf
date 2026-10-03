@@ -1,7 +1,7 @@
 package com.bookshelf.ebook;
 
 import com.bookshelf.book.domain.Book;
-import com.bookshelf.book.infrastructure.BookRepository;
+import com.bookshelf.book.infrastructure.persistence.BookRepository;
 import com.bookshelf.common.Isbn13;
 import com.bookshelf.support.*;
 import org.junit.jupiter.api.BeforeEach;

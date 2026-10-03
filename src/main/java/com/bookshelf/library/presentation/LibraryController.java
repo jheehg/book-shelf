@@ -1,7 +1,7 @@
 package com.bookshelf.library.presentation;
 
-import com.bookshelf.library.Region;
-import com.bookshelf.library.application.LibrarySearch;
+import com.bookshelf.library.domain.Region;
+import com.bookshelf.library.infrastructure.persistence.LibrarySearch;
 import com.bookshelf.library.application.LibraryView;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

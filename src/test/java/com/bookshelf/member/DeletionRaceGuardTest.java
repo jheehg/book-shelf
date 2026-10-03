@@ -1,8 +1,8 @@
 package com.bookshelf.member;
 
-import com.bookshelf.auth.UnauthorizedException;
+import com.bookshelf.auth.application.UnauthorizedException;
 import com.bookshelf.common.Isbn13;
-import com.bookshelf.library.application.MyLibrariesWriter;
+import com.bookshelf.library.infrastructure.persistence.MyLibrariesWriter;
 import com.bookshelf.member.domain.Member;
 import com.bookshelf.record.application.RecordWriter;
 import com.bookshelf.record.domain.ReadingStatus;

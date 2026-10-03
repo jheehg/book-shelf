@@ -3,12 +3,12 @@ package com.bookshelf.member.application;
 import com.bookshelf.common.BookshelfProperties;
 import com.bookshelf.common.DomainException;
 import com.bookshelf.member.domain.Member;
+import com.bookshelf.member.infrastructure.persistence.ActiveMemberLock;
+import com.bookshelf.member.infrastructure.persistence.ShelfPersistence;
 import com.bookshelf.record.domain.Visibility;
-import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Timestamp;
 import java.time.Clock;
 
 /**
@@ -19,15 +19,15 @@ public class ShelfService {
 
     private final MemberService members;
     private final ActiveMemberLock memberLock;
-    private final JdbcClient jdbc;
+    private final ShelfPersistence shelfPersistence;
     private final BookshelfProperties properties;
     private final Clock clock;
 
-    public ShelfService(MemberService members, ActiveMemberLock memberLock, JdbcClient jdbc,
+    public ShelfService(MemberService members, ActiveMemberLock memberLock, ShelfPersistence shelfPersistence,
                         BookshelfProperties properties, Clock clock) {
         this.members = members;
         this.memberLock = memberLock;
-        this.jdbc = jdbc;
+        this.shelfPersistence = shelfPersistence;
         this.properties = properties;
         this.clock = clock;
     }
@@ -44,14 +44,7 @@ public class ShelfService {
         }
         memberLock.lock(memberId);
         Member member = members.active(memberId);
-        jdbc.sql("""
-                UPDATE reading_record SET visibility = :visibility, updated_at = :now
-                WHERE member_id = :memberId AND status = 'DONE'
-                """)
-                .param("visibility", mode.name())
-                .param("now", Timestamp.from(clock.instant()))
-                .param("memberId", memberId)
-                .update();
+        shelfPersistence.publishCompletedRecords(memberId, mode, clock.instant());
         member.openShelf();
         return view(member);
     }
@@ -65,16 +58,7 @@ public class ShelfService {
     }
 
     private ShelfView view(Member member) {
-        record Counts(int done, int visible) {
-        }
-        Counts counts = jdbc.sql("""
-                SELECT count(*) FILTER (WHERE status = 'DONE') AS done,
-                       count(*) FILTER (WHERE visibility IN ('PUBLIC', 'RATING_ONLY')) AS visible
-                FROM reading_record WHERE member_id = :memberId
-                """)
-                .param("memberId", member.getId())
-                .query((rs, rowNum) -> new Counts(rs.getInt("done"), rs.getInt("visible")))
-                .single();
+        ShelfPersistence.Counts counts = shelfPersistence.counts(member.getId());
         return new ShelfView(member.isShelfPublic(), properties.siteUrl() + "/u/" + member.getSlug(),
                 counts.done(), counts.visible());
     }

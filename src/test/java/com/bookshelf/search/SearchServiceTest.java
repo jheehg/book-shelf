@@ -1,8 +1,12 @@
 package com.bookshelf.search;
 
+import com.bookshelf.search.application.SearchResult;
+import com.bookshelf.search.application.SearchService;
+import com.bookshelf.search.application.SearchUnavailableException;
+
 import com.bookshelf.book.application.BookView;
-import com.bookshelf.book.infrastructure.BookRepository;
-import com.bookshelf.book.infrastructure.SaleSnapshotRepository;
+import com.bookshelf.book.infrastructure.persistence.BookRepository;
+import com.bookshelf.book.infrastructure.persistence.SaleSnapshotRepository;
 import com.bookshelf.common.DomainException;
 import com.bookshelf.support.DbCleaner;
 import com.bookshelf.support.Fixtures;

@@ -1,5 +1,7 @@
 package com.bookshelf.search;
 
+import com.bookshelf.search.domain.QueryNormalizer;
+
 import com.bookshelf.support.DbCleaner;
 import com.bookshelf.support.Fixtures;
 import com.bookshelf.support.KakaoStub;

@@ -1,10 +1,12 @@
 package com.bookshelf.library.application;
 
-import com.bookshelf.library.LibraryDirectory;
-import com.bookshelf.library.LibraryPage;
-import com.bookshelf.library.Region;
-import com.bookshelf.provider.CallPurpose;
-import com.bookshelf.provider.ProviderUnavailableException;
+import com.bookshelf.library.infrastructure.persistence.LibraryWriter;
+
+import com.bookshelf.library.domain.LibraryDirectory;
+import com.bookshelf.library.domain.LibraryPage;
+import com.bookshelf.library.domain.Region;
+import com.bookshelf.provider.domain.CallPurpose;
+import com.bookshelf.provider.domain.ProviderUnavailableException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 

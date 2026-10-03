@@ -1,13 +1,13 @@
 package com.bookshelf.common;
 
-import com.bookshelf.auth.ApiAuthenticationEntryPoint;
-import com.bookshelf.auth.UnauthorizedException;
-import com.bookshelf.auth.apple.AppleRejectedException;
-import com.bookshelf.auth.apple.AppleUnavailableException;
+import com.bookshelf.auth.infrastructure.security.ApiAuthenticationEntryPoint;
+import com.bookshelf.auth.application.UnauthorizedException;
+import com.bookshelf.auth.infrastructure.provider.apple.AppleRejectedException;
+import com.bookshelf.auth.infrastructure.provider.apple.AppleUnavailableException;
 import com.bookshelf.library.application.LibraryChangeLimitException;
-import com.bookshelf.provider.ProviderUnavailableException;
-import com.bookshelf.provider.UserQuotaExceededException;
-import com.bookshelf.search.SearchUnavailableException;
+import com.bookshelf.provider.domain.ProviderUnavailableException;
+import com.bookshelf.provider.domain.UserQuotaExceededException;
+import com.bookshelf.search.application.SearchUnavailableException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;

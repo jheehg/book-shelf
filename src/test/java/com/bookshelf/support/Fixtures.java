@@ -1,14 +1,14 @@
 package com.bookshelf.support;
 
 import com.bookshelf.book.domain.Book;
-import com.bookshelf.book.infrastructure.BookRepository;
+import com.bookshelf.book.infrastructure.persistence.BookRepository;
 import com.bookshelf.common.Isbn13;
 import com.bookshelf.member.domain.Member;
-import com.bookshelf.member.infrastructure.MemberRepository;
+import com.bookshelf.member.infrastructure.persistence.MemberRepository;
 import com.bookshelf.record.domain.ReadingRecord;
 import com.bookshelf.record.domain.ReadingStatus;
 import com.bookshelf.record.domain.Visibility;
-import com.bookshelf.record.infrastructure.ReadingRecordRepository;
+import com.bookshelf.record.infrastructure.persistence.ReadingRecordRepository;
 import org.springframework.boot.test.context.TestComponent;
 
 import java.time.Instant;

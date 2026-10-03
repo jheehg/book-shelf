@@ -1,9 +1,11 @@
 package com.bookshelf.book.application;
 
-import com.bookshelf.book.infrastructure.BookRepository;
-import com.bookshelf.catalog.BookCatalog;
+import com.bookshelf.book.domain.Book;
+
+import com.bookshelf.book.infrastructure.persistence.BookRepository;
+import com.bookshelf.book.application.catalog.BookCatalog;
 import com.bookshelf.common.Isbn13;
-import com.bookshelf.provider.CallPurpose;
+import com.bookshelf.provider.domain.CallPurpose;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;

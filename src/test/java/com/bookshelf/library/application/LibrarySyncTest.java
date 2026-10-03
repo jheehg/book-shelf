@@ -1,6 +1,8 @@
 package com.bookshelf.library.application;
 
-import com.bookshelf.library.LibraryDirectory;
+import com.bookshelf.library.infrastructure.persistence.LibraryWriter;
+
+import com.bookshelf.library.domain.LibraryDirectory;
 import com.bookshelf.support.DbCleaner;
 import com.bookshelf.support.LibraryStub;
 import com.bookshelf.support.MutableClock;

@@ -1,5 +1,7 @@
 package com.bookshelf.auth;
 
+import com.bookshelf.auth.infrastructure.security.JwtProperties;
+
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;

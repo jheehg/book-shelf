@@ -1,6 +1,6 @@
 package com.bookshelf.library.application;
 
-import com.bookshelf.library.HoldingState;
+import com.bookshelf.library.domain.HoldingState;
 
 import java.time.Instant;
 

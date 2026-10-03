@@ -2,8 +2,8 @@ package com.bookshelf.book.application;
 
 import com.bookshelf.book.domain.SaleSnapshot;
 import com.bookshelf.book.domain.SaleStatus;
-import com.bookshelf.book.infrastructure.RefreshQueue;
-import com.bookshelf.book.infrastructure.SaleSnapshotRepository;
+import com.bookshelf.book.infrastructure.persistence.RefreshQueue;
+import com.bookshelf.book.infrastructure.persistence.SaleSnapshotRepository;
 import com.bookshelf.common.Isbn13;
 import com.bookshelf.support.DbCleaner;
 import com.bookshelf.support.Fixtures;

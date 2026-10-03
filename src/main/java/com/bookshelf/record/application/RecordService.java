@@ -1,18 +1,20 @@
 package com.bookshelf.record.application;
 
+import com.bookshelf.common.DomainException;
+
 import com.bookshelf.book.application.BookLookupService;
 import com.bookshelf.book.application.BookView;
 import com.bookshelf.book.domain.Book;
-import com.bookshelf.book.infrastructure.BookRepository;
+import com.bookshelf.book.infrastructure.persistence.BookRepository;
 import com.bookshelf.common.Isbn13;
 import com.bookshelf.common.NotFoundException;
 import com.bookshelf.member.application.MemberService;
-import com.bookshelf.provider.CallPurpose;
-import com.bookshelf.provider.ProviderUnavailableException;
-import com.bookshelf.provider.UserQuotaExceededException;
+import com.bookshelf.provider.domain.CallPurpose;
+import com.bookshelf.provider.domain.ProviderUnavailableException;
+import com.bookshelf.provider.domain.UserQuotaExceededException;
 import com.bookshelf.record.domain.ReadingRecord;
 import com.bookshelf.record.domain.ReadingStatus;
-import com.bookshelf.record.infrastructure.ReadingRecordRepository;
+import com.bookshelf.record.infrastructure.persistence.ReadingRecordRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 

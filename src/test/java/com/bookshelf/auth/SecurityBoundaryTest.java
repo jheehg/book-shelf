@@ -1,5 +1,7 @@
 package com.bookshelf.auth;
 
+import com.bookshelf.record.domain.Visibility;
+
 import com.bookshelf.support.DbCleaner;
 import com.bookshelf.support.Fixtures;
 import com.bookshelf.support.TestJwt;

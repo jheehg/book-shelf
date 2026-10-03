@@ -1,6 +1,9 @@
 package com.bookshelf.auth.apple;
 
-import com.bookshelf.auth.UnauthorizedException;
+import com.bookshelf.auth.infrastructure.provider.apple.AppleIdTokenVerifier;
+import com.bookshelf.auth.infrastructure.provider.apple.AppleIdentity;
+
+import com.bookshelf.auth.application.UnauthorizedException;
 import com.bookshelf.support.AppleStub;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

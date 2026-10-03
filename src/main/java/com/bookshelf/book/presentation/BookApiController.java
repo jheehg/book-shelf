@@ -1,15 +1,17 @@
 package com.bookshelf.book.presentation;
 
+import com.bookshelf.common.ApiExceptionHandler;
+
 import com.bookshelf.book.application.BookDetail;
 import com.bookshelf.book.application.BookLookupService;
 import com.bookshelf.book.application.BookView;
 import com.bookshelf.book.application.SaleService;
 import com.bookshelf.common.Isbn13;
 import com.bookshelf.common.NotFoundException;
-import com.bookshelf.links.LinkGroup;
-import com.bookshelf.links.StoreLink;
-import com.bookshelf.links.StoreLinks;
-import com.bookshelf.provider.CallPurpose;
+import com.bookshelf.links.domain.LinkGroup;
+import com.bookshelf.links.domain.StoreLink;
+import com.bookshelf.links.domain.StoreLinks;
+import com.bookshelf.provider.domain.CallPurpose;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;

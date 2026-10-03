@@ -1,6 +1,6 @@
 package com.bookshelf.member.application;
 
-import com.bookshelf.member.infrastructure.MemberRepository;
+import com.bookshelf.member.infrastructure.persistence.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

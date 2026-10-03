@@ -1,6 +1,8 @@
 package com.bookshelf.search;
 
-import com.bookshelf.auth.RefreshTokenStore;
+import com.bookshelf.search.infrastructure.persistence.SearchCacheCleanup;
+
+import com.bookshelf.auth.infrastructure.persistence.RefreshTokenStore;
 import com.bookshelf.support.DbCleaner;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

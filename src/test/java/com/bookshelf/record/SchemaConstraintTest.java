@@ -1,5 +1,7 @@
 package com.bookshelf.record;
 
+import com.bookshelf.record.domain.ReadingStatus;
+
 import com.bookshelf.support.DbCleaner;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;

@@ -1,5 +1,8 @@
 package com.bookshelf.auth.apple;
 
+import com.bookshelf.auth.infrastructure.provider.apple.AppleClientSecret;
+import com.bookshelf.auth.infrastructure.provider.apple.AppleProperties;
+
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.crypto.ECDSAVerifier;
 import com.nimbusds.jwt.SignedJWT;

@@ -1,5 +1,7 @@
 package com.bookshelf.common;
 
+import com.bookshelf.provider.infrastructure.persistence.CallBudget;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
