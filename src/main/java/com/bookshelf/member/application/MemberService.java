@@ -4,6 +4,7 @@ import com.bookshelf.auth.UnauthorizedException;
 import com.bookshelf.common.ConflictException;
 import com.bookshelf.member.domain.Member;
 import com.bookshelf.member.infrastructure.MemberRepository;
+import com.bookshelf.record.domain.Visibility;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,9 +28,9 @@ public class MemberService {
         return MeView.of(active(memberId));
     }
 
-    /** slug를 바꾸면 옛 서재 링크는 404가 된다 — 앱이 바꾸기 전에 알린다(Phase 3) */
+    /** slug를 바꾸면 옛 서재 링크는 404가 된다 — 앱이 바꾸기 전에 알린다. null인 필드는 그대로 둔다 */
     @Transactional
-    public MeView update(long memberId, String slug, String displayName) {
+    public MeView update(long memberId, String slug, String displayName, Visibility defaultVisibility) {
         Member m = active(memberId);
         if (slug != null && !slug.equals(m.getSlug())) {
             if (members.existsBySlug(slug)) {
@@ -39,6 +40,9 @@ public class MemberService {
         }
         if (displayName != null) {
             m.rename(displayName);
+        }
+        if (defaultVisibility != null) {
+            m.changeDefaultVisibility(defaultVisibility);
         }
         return MeView.of(m);
     }

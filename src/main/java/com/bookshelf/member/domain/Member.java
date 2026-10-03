@@ -104,6 +104,13 @@ public class Member {
         this.shelfPublic = false;
     }
 
+    public void changeDefaultVisibility(Visibility visibility) {
+        if (visibility == null) {
+            throw new DomainException("기본 공개 범위가 없다");
+        }
+        this.defaultVisibility = visibility;
+    }
+
     /** 공개 조회는 deleted_at으로도 거르지만, 스위치까지 내려 두 겹으로 닫는다 */
     public void withdraw(Instant now) {
         this.shelfPublic = false;
