@@ -63,6 +63,22 @@ void main() {
     );
   });
 
+  testWidgets('서재에서 제목 검색 화면으로 이동할 수 있다', (tester) async {
+    await pumpApp(tester, api);
+
+    await tester.tap(find.byTooltip('책 검색'));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(TextField), findsOneWidget);
+    expect(
+      find.byWidgetPredicate(
+        (widget) =>
+            widget is TextField && widget.decoration?.hintText == '제목이나 저자',
+      ),
+      findsOneWidget,
+    );
+  });
+
   testWidgets('읽기 상태로 거른다', (tester) async {
     await pumpApp(tester, api);
     await tester.tap(find.widgetWithText(ChoiceChip, '읽고 싶다'));

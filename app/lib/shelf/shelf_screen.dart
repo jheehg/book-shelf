@@ -25,6 +25,16 @@ class _ShelfScreenState extends ConsumerState<ShelfScreen> {
         title: const Text('내 서재'),
         actions: [
           IconButton(
+            tooltip: '책 검색',
+            icon: const Icon(Icons.search),
+            onPressed: () => context.push('/search'),
+          ),
+          IconButton(
+            tooltip: '바코드 찍기',
+            icon: const Icon(Icons.qr_code_scanner),
+            onPressed: () => context.push('/scan'),
+          ),
+          IconButton(
             key: const Key('logout'),
             tooltip: '로그아웃',
             icon: const Icon(Icons.logout),

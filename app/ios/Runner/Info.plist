@@ -31,6 +31,8 @@
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>책 뒤의 바코드를 찍어 기록하려고 카메라를 씁니다.</string>
 	<key>NSLocalNetworkUsageDescription</key>
 	<string>개발용 서버(맥)에 연결하려고 로컬 네트워크를 씁니다.</string>
 	<key>UIApplicationSceneManifest</key>

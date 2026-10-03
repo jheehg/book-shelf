@@ -4,6 +4,9 @@ import 'package:go_router/go_router.dart';
 
 import 'auth/auth_controller.dart';
 import 'auth/login_screen.dart';
+import 'book/book_detail_screen.dart';
+import 'scan/scan_screen.dart';
+import 'search/search_screen.dart';
 import 'shelf/record_edit_screen.dart';
 import 'shelf/shelf_screen.dart';
 
@@ -17,6 +20,13 @@ final List<RouteBase> appRoutes = [
   ),
   GoRoute(path: '/login', builder: (_, _) => const LoginScreen()),
   GoRoute(path: '/', builder: (_, _) => const ShelfScreen()),
+  GoRoute(path: '/search', builder: (_, _) => const SearchScreen()),
+  GoRoute(path: '/scan', builder: (_, _) => const ScanScreen()),
+  GoRoute(
+    path: '/book/:isbn',
+    builder: (_, state) =>
+        BookDetailScreen(isbn: state.pathParameters['isbn']!),
+  ),
   GoRoute(
     path: '/record/:id',
     builder: (_, state) =>
