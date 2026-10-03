@@ -66,6 +66,16 @@ providers:
     background-ceiling: 300
     reset-zone: Asia/Seoul
     cool-down: 60s
+  google:
+    api-key: ${GOOGLE_BOOKS_KEY}
+    base-url: ${GOOGLE_BOOKS_BASE_URL:https://www.googleapis.com}
+    connect-timeout: 1s
+    read-timeout: 3s
+    # 확인한 일일 1,000회 할당량의 90% / 30%
+    daily-limit: 900
+    background-ceiling: 300
+    reset-zone: America/Los_Angeles
+    cool-down: 60s
 
 bookshelf:
   site-url: ${SITE_URL:http://localhost:8080}

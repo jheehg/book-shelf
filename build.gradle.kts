@@ -50,11 +50,13 @@ tasks.withType<Test> {
     // 테스트는 별도 DB를 쓴다. 로컬 개발 데이터를 지우지 않기 위해서다
     environment("DB_URL", "jdbc:postgresql://localhost:5433/bookshelf_test")
     environment("KAKAO_REST_API_KEY", "test-kakao-key")
+    environment("GOOGLE_BOOKS_KEY", "test-google-key")
     // 테스트 컨텍스트에서 백그라운드 작업(갱신 큐, 백필)이 스스로 돌지 않게 한다. 테스트는 runOnce()를 직접 부른다
     environment("BACKGROUND_JOBS_ENABLED", "false")
     // 쿨다운은 싱글턴 빈의 상태라 한 테스트의 실패가 다음 테스트로 샌다.
     // 컨텍스트 전체에서는 끄고, 쿨다운 자체는 KakaoBookCatalogTest가 직접 조립해 검증한다
     systemProperty("providers.kakao.cool-down", "0s")
+    systemProperty("providers.google.cool-down", "0s")
     // Phase 2 테스트용 값(모두 가짜)
     environment("JWT_SECRET", "test-jwt-secret-test-jwt-secret-0123456789abcdef")
     environment("LIBRARY_API_KEY", "test-library-key")
