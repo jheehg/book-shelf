@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-void main() => runApp(const BookShelfApp());
+import 'app.dart';
+import 'auth/auth_controller.dart';
 
-class BookShelfApp extends StatelessWidget {
-  const BookShelfApp({super.key});
-
-  @override
-  Widget build(BuildContext context) => MaterialApp(
-    title: '책장',
-    theme: ThemeData(
-      colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
+void main() {
+  runApp(
+    ProviderScope(
+      // 서버 오류를 자동 재시도하면 외부 제공자 호출 예산까지 소모할 수 있다.
+      retry: (retryCount, error) => null,
+      overrides: [signedOutWiring()],
+      child: const BookShelfApp(),
     ),
-    home: const Scaffold(body: Center(child: Text('책장을 준비하고 있어요.'))),
   );
 }

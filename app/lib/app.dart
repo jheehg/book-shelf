@@ -1,0 +1,63 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+
+import 'auth/auth_controller.dart';
+import 'auth/login_screen.dart';
+import 'shelf/shelf_screen.dart';
+
+final initialLocationProvider = Provider<String>((ref) => '/');
+
+final List<RouteBase> appRoutes = [
+  GoRoute(
+    path: '/splash',
+    builder: (_, _) =>
+        const Scaffold(body: Center(child: CircularProgressIndicator())),
+  ),
+  GoRoute(path: '/login', builder: (_, _) => const LoginScreen()),
+  GoRoute(path: '/', builder: (_, _) => const ShelfScreen()),
+];
+
+final routerProvider = Provider<GoRouter>((ref) {
+  final auth = ValueNotifier<AuthStatus>(ref.read(authProvider));
+  ref.listen<AuthStatus>(authProvider, (_, next) => auth.value = next);
+  final router = GoRouter(
+    initialLocation: ref.read(initialLocationProvider),
+    refreshListenable: auth,
+    redirect: (_, state) => _redirect(
+      auth.value,
+      state.matchedLocation,
+      ref.read(initialLocationProvider),
+    ),
+    routes: appRoutes,
+  );
+  ref.onDispose(() {
+    router.dispose();
+    auth.dispose();
+  });
+  return router;
+});
+
+String? _redirect(AuthStatus auth, String location, String initial) {
+  switch (auth) {
+    case AuthStatus.unknown:
+      return location == '/splash' ? null : '/splash';
+    case AuthStatus.signedOut:
+      return location == '/login' ? null : '/login';
+    case AuthStatus.signedIn:
+      if (location == '/login') return '/';
+      if (location == '/splash') return initial == '/splash' ? '/' : initial;
+      return null;
+  }
+}
+
+class BookShelfApp extends ConsumerWidget {
+  const BookShelfApp({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) => MaterialApp.router(
+    title: '책장',
+    theme: ThemeData(colorSchemeSeed: Colors.brown, useMaterial3: true),
+    routerConfig: ref.watch(routerProvider),
+  );
+}
