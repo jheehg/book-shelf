@@ -39,7 +39,7 @@ lib/
 └── share/          서재 공개와 공유 흐름
 ```
 
-현재는 앱 골격과 API 모델·오류 처리·토큰 저장소를 구현한 단계입니다. 기능별 구현 순서는 루트의 `docs/superpowers/plans/2026-10-02-phase3-app.md`를 참고합니다.
+현재는 앱 골격과 API 계층까지 구현한 단계입니다. 화면 구현 순서는 루트의 `docs/superpowers/plans/2026-10-02-phase3-app.md`를 참고합니다.
 
 ## 주요 명령
 
