@@ -1,0 +1,285 @@
+{
+  "kind": "books#volumes",
+  "totalItems": 1,
+  "items": [
+    {
+      "kind": "books#volume",
+      "id": "YOqIDwAAQBAJ",
+      "etag": "3SmiRgiGo3M",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/YOqIDwAAQBAJ",
+      "volumeInfo": {
+        "title": "아주 작은 습관의 힘(50만 부 기념 스페셜 에디션)",
+        "authors": [
+          "제임스 클리어"
+        ],
+        "publisher": "The Business Books and Co., Ltd",
+        "publishedDate": "2019-02-20",
+        "description": "2018년 출간 즉시 아마존 베스트셀러 1위를 기록하며 전 세계 2,500만 명의 삶을 바꾼 습관의 바이블 《아주 작은 습관의 힘》이 국내 50만 부 돌파를 기념해 스페셜 에디션으로 돌아왔다. 출간 7년이 지난 지금도 이 책이 전 세계 독자들에게 뜨거운 사랑을 받는 이유는, 성공이 거창한 결심에서가 아니라 아주 작게 반복되는 행동에서 시작된다는 사실을 과학적이고 구체적인 시스템으로 제시하기 때문이다. 이번 스페셜 에디션은 ‘작은 습관’을 ‘원자’(Atomic)로 시각화한 해외 원서와 동일한 이미지를 사용하여 책이 전하는 본질적인 메시지를 한층 더 강조한다. 고교 시절 촉망받는 야구선수였던 저자는 연습 중 동료의 야구 배트에 얼굴을 정통으로 강타당하는 큰 사고를 겪었다. 이 사고로 얼굴 뼈가 30조각이 났고, 왼쪽 눈이 튀어나와 실명 위기까지 왔으며, 심정지가 세 번이나 일어났다. 걸을 수조차 없었던 저자는 절망에 빠지는 대신 지금 당장 할 수 있는 아주 작은 일이라도 찾아 반복하자고 마음먹는다. 그 후 매일 걷기 연습을 해서 6개월 만에 운동을 할 수 있게 되었고, 6년 후에는 대학 최고 남자 선수가 되었다. 이 경험을 바탕으로 그는 자신을 인생의 나락에서 구해준 ‘아주 작은 습관의 힘’을 전 세계에 알리는 최고의 자기계발 전문가가 되었다. 이 책은 저자의 생생한 경험과 생물학, 뇌과학, 심리학의 최신 연구 결과를 집약해서 습관 하나로 인생을 변화시킬 수 있는 노하우를 제시한다. 만약 당신이 ‘새해에 운동을 해야지’라고 결심을 했다면 저자의 관점에서 이 목표는 실패할 수밖에 없다. 왜냐하면 습관을 만들기 위해서는 결심이 분명해야 하고(제1법칙), 매력적이어야 하며(제2법칙), 쉬워야 하고(제3법칙), 만족스러워야 하기(제4법칙) 때문이다. 당신의 결심은 여기에 단 한 가지도 해당되지 않는다. 정말 변화할 수 있는 습관을 만들기 위해서 당신의 접근 방식은 완전히 달라져야 한다. 이 책에서는 이 네 가지 법칙을 바탕으로 어떻게 하면 빠르고, 효율적이고, 확실하게 변화할 수 있는지 알려준다. 금연, 다이어트에서부터 비즈니스에서 탁월한 성과를 이뤄내기까지, 저자가 제안하는 방법으로 매일 조금씩 좋은 습관을 만든다면 무엇을 결심하든 원하는 것을 얻을 것이다.",
+        "industryIdentifiers": [
+          {
+            "type": "ISBN_13",
+            "identifier": "9791162540657"
+          }
+        ],
+        "readingModes": {
+          "text": true,
+          "image": true
+        },
+        "pageCount": 412,
+        "printType": "BOOK",
+        "categories": [
+          "Self-Help"
+        ],
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": true,
+        "contentVersion": "2.28.28.0.preview.3",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=YOqIDwAAQBAJ&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=YOqIDwAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+        },
+        "language": "ko",
+        "previewLink": "http://books.google.co.kr/books?id=YOqIDwAAQBAJ&printsec=frontcover&dq=intitle:%EC%95%84%EC%A3%BC+%EC%9E%91%EC%9D%80+%EC%8A%B5%EA%B4%80%EC%9D%98+%ED%9E%98+inauthor:%EC%A0%9C%EC%9E%84%EC%8A%A4+%ED%81%B4%EB%A6%AC%EC%96%B4&hl=&cd=1&source=gbs_api",
+        "infoLink": "https://play.google.com/store/books/details?id=YOqIDwAAQBAJ&source=gbs_api",
+        "canonicalVolumeLink": "https://play.google.com/store/books/details?id=YOqIDwAAQBAJ"
+      },
+      "saleInfo": {
+        "country": "KR",
+        "saleability": "FOR_SALE",
+        "isEbook": true,
+        "listPrice": {
+          "amount": 12600,
+          "currencyCode": "KRW"
+        },
+        "retailPrice": {
+          "amount": 11340,
+          "currencyCode": "KRW"
+        },
+        "buyLink": "https://play.google.com/store/books/details?id=YOqIDwAAQBAJ&rdid=book-YOqIDwAAQBAJ&rdot=1&source=gbs_api",
+        "offers": [
+          {
+            "finskyOfferType": 1,
+            "listPrice": {
+              "amountInMicros": 12600000000,
+              "currencyCode": "KRW"
+            },
+            "retailPrice": {
+              "amountInMicros": 11340000000,
+              "currencyCode": "KRW"
+            }
+          }
+        ]
+      },
+      "accessInfo": {
+        "country": "KR",
+        "viewability": "PARTIAL",
+        "embeddable": true,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": true,
+          "acsTokenLink": "http://books.google.co.kr/books/download/%EC%95%84%EC%A3%BC_%EC%9E%91%EC%9D%80_%EC%8A%B5%EA%B4%80%EC%9D%98_%ED%9E%98_50%EB%A7%8C_%EB%B6%80-sample-epub.acsm?id=YOqIDwAAQBAJ&format=epub&output=acs4_fulfillment_token&dl_type=sample&source=gbs_api"
+        },
+        "pdf": {
+          "isAvailable": true,
+          "acsTokenLink": "http://books.google.co.kr/books/download/%EC%95%84%EC%A3%BC_%EC%9E%91%EC%9D%80_%EC%8A%B5%EA%B4%80%EC%9D%98_%ED%9E%98_50%EB%A7%8C_%EB%B6%80-sample-pdf.acsm?id=YOqIDwAAQBAJ&format=pdf&output=acs4_fulfillment_token&dl_type=sample&source=gbs_api"
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=YOqIDwAAQBAJ&hl=&source=gbs_api",
+        "accessViewStatus": "SAMPLE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "2018년 출간 즉시 아마존 베스트셀러 1위를 기록하며 전 세계 2,500만 명의 삶을 바꾼 습관의 바이블 《아주 작은 습관의 힘》이 국내 50만 부 돌파를 기념해 스페셜 에디션으로 ..."
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "YOqIDwAAQBAJ",
+      "etag": "vTUzLPQEKSs",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/YOqIDwAAQBAJ",
+      "volumeInfo": {
+        "title": "아주 작은 습관의 힘(50만 부 기념 스페셜 에디션)",
+        "authors": [
+          "제임스 클리어"
+        ],
+        "publisher": "The Business Books and Co., Ltd",
+        "publishedDate": "2019-02-20",
+        "description": "2018년 출간 즉시 아마존 베스트셀러 1위를 기록하며 전 세계 2,500만 명의 삶을 바꾼 습관의 바이블 《아주 작은 습관의 힘》이 국내 50만 부 돌파를 기념해 스페셜 에디션으로 돌아왔다. 출간 7년이 지난 지금도 이 책이 전 세계 독자들에게 뜨거운 사랑을 받는 이유는, 성공이 거창한 결심에서가 아니라 아주 작게 반복되는 행동에서 시작된다는 사실을 과학적이고 구체적인 시스템으로 제시하기 때문이다. 이번 스페셜 에디션은 ‘작은 습관’을 ‘원자’(Atomic)로 시각화한 해외 원서와 동일한 이미지를 사용하여 책이 전하는 본질적인 메시지를 한층 더 강조한다. 고교 시절 촉망받는 야구선수였던 저자는 연습 중 동료의 야구 배트에 얼굴을 정통으로 강타당하는 큰 사고를 겪었다. 이 사고로 얼굴 뼈가 30조각이 났고, 왼쪽 눈이 튀어나와 실명 위기까지 왔으며, 심정지가 세 번이나 일어났다. 걸을 수조차 없었던 저자는 절망에 빠지는 대신 지금 당장 할 수 있는 아주 작은 일이라도 찾아 반복하자고 마음먹는다. 그 후 매일 걷기 연습을 해서 6개월 만에 운동을 할 수 있게 되었고, 6년 후에는 대학 최고 남자 선수가 되었다. 이 경험을 바탕으로 그는 자신을 인생의 나락에서 구해준 ‘아주 작은 습관의 힘’을 전 세계에 알리는 최고의 자기계발 전문가가 되었다. 이 책은 저자의 생생한 경험과 생물학, 뇌과학, 심리학의 최신 연구 결과를 집약해서 습관 하나로 인생을 변화시킬 수 있는 노하우를 제시한다. 만약 당신이 ‘새해에 운동을 해야지’라고 결심을 했다면 저자의 관점에서 이 목표는 실패할 수밖에 없다. 왜냐하면 습관을 만들기 위해서는 결심이 분명해야 하고(제1법칙), 매력적이어야 하며(제2법칙), 쉬워야 하고(제3법칙), 만족스러워야 하기(제4법칙) 때문이다. 당신의 결심은 여기에 단 한 가지도 해당되지 않는다. 정말 변화할 수 있는 습관을 만들기 위해서 당신의 접근 방식은 완전히 달라져야 한다. 이 책에서는 이 네 가지 법칙을 바탕으로 어떻게 하면 빠르고, 효율적이고, 확실하게 변화할 수 있는지 알려준다. 금연, 다이어트에서부터 비즈니스에서 탁월한 성과를 이뤄내기까지, 저자가 제안하는 방법으로 매일 조금씩 좋은 습관을 만든다면 무엇을 결심하든 원하는 것을 얻을 것이다.",
+        "industryIdentifiers": [
+          {
+            "type": "ISBN_13",
+            "identifier": "9791162540657"
+          }
+        ],
+        "readingModes": {
+          "text": true,
+          "image": true
+        },
+        "pageCount": 412,
+        "printType": "BOOK",
+        "categories": [
+          "Self-Help"
+        ],
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": true,
+        "contentVersion": "2.28.28.0.preview.3",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=YOqIDwAAQBAJ&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=YOqIDwAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+        },
+        "language": "ko",
+        "previewLink": "http://books.google.co.kr/books?id=YOqIDwAAQBAJ&pg=PP2&dq=intitle:%EC%95%84%EC%A3%BC+%EC%9E%91%EC%9D%80+%EC%8A%B5%EA%B4%80%EC%9D%98+%ED%9E%98+inauthor:%EC%A0%9C%EC%9E%84%EC%8A%A4+%ED%81%B4%EB%A6%AC%EC%96%B4&hl=&cd=2&source=gbs_api",
+        "infoLink": "https://play.google.com/store/books/details?id=YOqIDwAAQBAJ&source=gbs_api",
+        "canonicalVolumeLink": "https://play.google.com/store/books/details?id=YOqIDwAAQBAJ"
+      },
+      "saleInfo": {
+        "country": "KR",
+        "saleability": "FOR_SALE",
+        "isEbook": true,
+        "listPrice": {
+          "amount": 12600,
+          "currencyCode": "KRW"
+        },
+        "retailPrice": {
+          "amount": 11340,
+          "currencyCode": "KRW"
+        },
+        "buyLink": "https://play.google.com/store/books/details?id=YOqIDwAAQBAJ&rdid=book-YOqIDwAAQBAJ&rdot=1&source=gbs_api",
+        "offers": [
+          {
+            "finskyOfferType": 1,
+            "listPrice": {
+              "amountInMicros": 12600000000,
+              "currencyCode": "KRW"
+            },
+            "retailPrice": {
+              "amountInMicros": 11340000000,
+              "currencyCode": "KRW"
+            }
+          }
+        ]
+      },
+      "accessInfo": {
+        "country": "KR",
+        "viewability": "PARTIAL",
+        "embeddable": true,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": true,
+          "acsTokenLink": "http://books.google.co.kr/books/download/%EC%95%84%EC%A3%BC_%EC%9E%91%EC%9D%80_%EC%8A%B5%EA%B4%80%EC%9D%98_%ED%9E%98_50%EB%A7%8C_%EB%B6%80-sample-epub.acsm?id=YOqIDwAAQBAJ&format=epub&output=acs4_fulfillment_token&dl_type=sample&source=gbs_api"
+        },
+        "pdf": {
+          "isAvailable": true,
+          "acsTokenLink": "http://books.google.co.kr/books/download/%EC%95%84%EC%A3%BC_%EC%9E%91%EC%9D%80_%EC%8A%B5%EA%B4%80%EC%9D%98_%ED%9E%98_50%EB%A7%8C_%EB%B6%80-sample-pdf.acsm?id=YOqIDwAAQBAJ&format=pdf&output=acs4_fulfillment_token&dl_type=sample&source=gbs_api"
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=YOqIDwAAQBAJ&hl=&source=gbs_api",
+        "accessViewStatus": "SAMPLE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "제임스 \u003cb\u003e클리어\u003c/b\u003e. 제임스 지은이 \u003cb\u003e클리어\u003c/b\u003e (James \u003cb\u003eClear\u003c/b\u003e) 미국 최고의 자기계발 전문가. 블로그 연 방문자 수 1,000만 명, 구독자 수 300만 명의 뉴스레터를 발행하는 파워블로거이 자 〈뉴욕 타임스〉 베스트셀러 작가다. 전세계 사람들에게 \u003cb\u003e습관\u003c/b\u003e 형성, 의사&nbsp;..."
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "zOH0EAAAQBAJ",
+      "etag": "YWDUKohA3v4",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/zOH0EAAAQBAJ",
+      "volumeInfo": {
+        "title": "하루 10분 가장 짧은 습관 수업",
+        "authors": [
+          "제임스 클리어, 앨리슨 비어드, 크리스티 드폴, 애니 맥키, 칸디 윈스 저 외 11명"
+        ],
+        "publisher": "위즈덤하우스",
+        "publishedDate": "2024-02-15",
+        "description": "“세계 최고 엘리트들은 어떻게 좋은 습관을 만드는가” 오늘도 작심삼일에 지친 당신을 위한 자기계발 전문가들의 족집게 성장 코칭 습관의 중요성은 모두가 알고 있다. 하지만 좋은 습관을 만드는 것은 쉽지 않다. 이 책은 작심삼일에 지친 사람들을 위해 『하버드 비즈니스 리뷰』가 습관에 관해 꼭 알아야 할 주제를 엄선한 자기계발서다. 베스트셀러《아주 작은 습관의 힘》의 저자인 제임스 클리어를 비롯해 시간 관리 코치, 리더십 코치, 경영학 교수 등 다양한 저자들이 좋은 습관을 형성해 인생을 바꾸는 방법을 심플하고 명쾌하게 알려준다. ‘새로운 습관을 만드는 방법’, ‘나쁜 습관과 이별하는 방법’, ‘체크리스트로 습관을 형성하는 방법’ 등 마인드 세팅에서 구체적인 실행 방안까지 습관에 관한 11가지 주제를 다루며, 컴팩트한 사이즈로 하루 10분 언제 어디서든 습관 공부를 시작하고 싶은 사람들에게 유용한 지식을 선사한다.",
+        "industryIdentifiers": [
+          {
+            "type": "ISBN_13",
+            "identifier": "9791171711291"
+          }
+        ],
+        "readingModes": {
+          "text": true,
+          "image": true
+        },
+        "pageCount": 122,
+        "printType": "BOOK",
+        "categories": [
+          "Self-Help"
+        ],
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "1.2.2.0.preview.3",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=zOH0EAAAQBAJ&printsec=frontcover&img=1&zoom=5&edge=curl&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=zOH0EAAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
+        },
+        "language": "ko",
+        "previewLink": "http://books.google.co.kr/books?id=zOH0EAAAQBAJ&printsec=frontcover&dq=intitle:%EC%95%84%EC%A3%BC+%EC%9E%91%EC%9D%80+%EC%8A%B5%EA%B4%80%EC%9D%98+%ED%9E%98+inauthor:%EC%A0%9C%EC%9E%84%EC%8A%A4+%ED%81%B4%EB%A6%AC%EC%96%B4&hl=&cd=3&source=gbs_api",
+        "infoLink": "https://play.google.com/store/books/details?id=zOH0EAAAQBAJ&source=gbs_api",
+        "canonicalVolumeLink": "https://play.google.com/store/books/details?id=zOH0EAAAQBAJ"
+      },
+      "saleInfo": {
+        "country": "KR",
+        "saleability": "FOR_SALE",
+        "isEbook": true,
+        "listPrice": {
+          "amount": 9660,
+          "currencyCode": "KRW"
+        },
+        "retailPrice": {
+          "amount": 8694,
+          "currencyCode": "KRW"
+        },
+        "buyLink": "https://play.google.com/store/books/details?id=zOH0EAAAQBAJ&rdid=book-zOH0EAAAQBAJ&rdot=1&source=gbs_api",
+        "offers": [
+          {
+            "finskyOfferType": 1,
+            "listPrice": {
+              "amountInMicros": 9660000000,
+              "currencyCode": "KRW"
+            },
+            "retailPrice": {
+              "amountInMicros": 8694000000,
+              "currencyCode": "KRW"
+            }
+          }
+        ]
+      },
+      "accessInfo": {
+        "country": "KR",
+        "viewability": "PARTIAL",
+        "embeddable": true,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": true,
+          "acsTokenLink": "http://books.google.co.kr/books/download/%ED%95%98%EB%A3%A8_10%EB%B6%84_%EA%B0%80%EC%9E%A5_%EC%A7%A7%EC%9D%80_%EC%8A%B5%EA%B4%80_%EC%88%98%EC%97%85-sample-epub.acsm?id=zOH0EAAAQBAJ&format=epub&output=acs4_fulfillment_token&dl_type=sample&source=gbs_api"
+        },
+        "pdf": {
+          "isAvailable": true,
+          "acsTokenLink": "http://books.google.co.kr/books/download/%ED%95%98%EB%A3%A8_10%EB%B6%84_%EA%B0%80%EC%9E%A5_%EC%A7%A7%EC%9D%80_%EC%8A%B5%EA%B4%80_%EC%88%98%EC%97%85-sample-pdf.acsm?id=zOH0EAAAQBAJ&format=pdf&output=acs4_fulfillment_token&dl_type=sample&source=gbs_api"
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=zOH0EAAAQBAJ&hl=&source=gbs_api",
+        "accessViewStatus": "SAMPLE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "“세계 최고 엘리트들은 어떻게 좋은 습관을 만드는가” 오늘도 작심삼일에 지친 당신을 위한 자기계발 전문가들의 족집게 성장 코칭 습관의 중요성은 모두가 알고 있다. 하지만 ..."
+      }
+    }
+  ]
+}
