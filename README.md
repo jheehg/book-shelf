@@ -128,4 +128,4 @@ set -a && . ./.env && set +a \\
 - 엔티티에는 `@Setter`, `@Data`, `@ToString`을 사용하지 않고 정적 팩토리로 생성합니다.
 - 사용자 입력은 Thymeleaf `th:text`로 출력합니다.
 
-상세한 제품 의도와 설계 근거는 `docs/superpowers/specs/2026-09-27-book-shelf-design.md`에서 확인할 수 있습니다.
+상세한 제품 의도, 설계 근거, 구현 상태는 [docs/README.md](docs/README.md)에서 확인할 수 있습니다.
