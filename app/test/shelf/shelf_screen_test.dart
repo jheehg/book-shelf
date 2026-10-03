@@ -71,6 +71,15 @@ void main() {
     expect(find.text('ISBN 9791100000007'), findsOneWidget);
   });
 
+  testWidgets('서재에서 기록을 누르면 편집 화면으로 간다', (tester) async {
+    await pumpApp(tester, api);
+    await tester.tap(find.text('소년이 온다'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('기록 고치기'), findsOneWidget);
+    expect(find.text('공개 범위'), findsOneWidget);
+  });
+
   testWidgets('로그아웃 후 다른 계정에는 앞사람의 기록이 남지 않는다', (tester) async {
     await pumpApp(tester, api);
     expect(find.text('소년이 온다'), findsOneWidget);

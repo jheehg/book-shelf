@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import 'auth/auth_controller.dart';
 import 'auth/login_screen.dart';
+import 'shelf/record_edit_screen.dart';
 import 'shelf/shelf_screen.dart';
 
 final initialLocationProvider = Provider<String>((ref) => '/');
@@ -16,6 +17,11 @@ final List<RouteBase> appRoutes = [
   ),
   GoRoute(path: '/login', builder: (_, _) => const LoginScreen()),
   GoRoute(path: '/', builder: (_, _) => const ShelfScreen()),
+  GoRoute(
+    path: '/record/:id',
+    builder: (_, state) =>
+        RecordEditScreen(id: int.parse(state.pathParameters['id']!)),
+  ),
 ];
 
 final routerProvider = Provider<GoRouter>((ref) {

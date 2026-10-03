@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../api/models.dart';
 import '../auth/auth_controller.dart';
@@ -104,6 +105,7 @@ class _RecordTile extends StatelessWidget {
       leading: Cover(url: record.book?.coverUrl, isbn: record.isbn13),
       title: Text(record.book?.title ?? 'ISBN ${record.isbn13}'),
       subtitle: Text('${record.status.label}$rating'),
+      onTap: () => context.push('/record/${record.id}'),
     );
   }
 }
