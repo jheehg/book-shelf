@@ -2,6 +2,7 @@ import 'package:bookshelf/api/api_error.dart';
 import 'package:bookshelf/api/models.dart';
 import 'package:bookshelf/api/providers.dart';
 import 'package:bookshelf/api/token_store.dart';
+import 'package:bookshelf/scan/scan_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -30,6 +31,13 @@ void main() {
         ],
       };
   });
+
+  Future<void> confirmLogout(WidgetTester tester) async {
+    await tester.tap(find.byKey(const Key('logout')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(TextButton, '로그아웃'));
+    await tester.pumpAndSettle();
+  }
 
   testWidgets('토큰이 없으면 로그인 화면이고 개발 로그인하면 서재로 간다', (tester) async {
     await pumpApp(tester, api, store: MemoryTokenStore());
@@ -90,10 +98,74 @@ void main() {
 
   testWidgets('읽기 상태로 거른다', (tester) async {
     await pumpApp(tester, api);
-    await tester.tap(find.widgetWithText(ChoiceChip, '읽고 싶다'));
+    await tester.tap(find.widgetWithText(ChoiceChip, '읽고 싶다 1'));
     await tester.pumpAndSettle();
     expect(find.text('소년이 온다'), findsNothing);
     expect(find.text('ISBN 9791100000007'), findsOneWidget);
+
+    await tester.tap(find.widgetWithText(ChoiceChip, '읽는 중 0'));
+    await tester.pumpAndSettle();
+    expect(find.text('이 상태의 기록이 없어요.'), findsOneWidget);
+    expect(find.widgetWithText(FilledButton, '바코드 찍기'), findsNothing);
+  });
+
+  testWidgets('거르기 칩에 상태별 권수를 보여준다', (tester) async {
+    await pumpApp(tester, api);
+    for (final label in ['전체 2', '읽고 싶다 1', '읽는 중 0', '읽음 1']) {
+      expect(find.widgetWithText(ChoiceChip, label), findsOneWidget);
+    }
+  });
+
+  testWidgets('권수가 두 자리여도 거르기 칩은 한 줄에 놓인다', (tester) async {
+    api.recordsBySlug['mine'] = [
+      for (var i = 0; i < 12; i++)
+        record(
+          i + 1,
+          '97889364341${i.toString().padLeft(2, '0')}',
+          ReadingStatus.done,
+        ),
+    ];
+    tester.view.physicalSize = const Size(1179, 2556);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.reset);
+    await pumpApp(tester, api);
+
+    expect(
+      tester.getTopLeft(find.byType(ChoiceChip).last).dy,
+      tester.getTopLeft(find.byType(ChoiceChip).first).dy,
+    );
+  });
+
+  testWidgets('기록에 저자와 상태, 별점을 함께 보여준다', (tester) async {
+    await pumpApp(tester, api);
+    expect(find.text('저자 · 읽음 · ★★★★★'), findsOneWidget);
+    expect(find.text('읽고 싶다'), findsOneWidget);
+  });
+
+  testWidgets('서재가 비어 있으면 바코드로 첫 책을 담도록 안내한다', (tester) async {
+    await pumpApp(tester, FakeApi());
+    expect(find.text('아직 기록이 없어요.'), findsOneWidget);
+    expect(find.text('책 뒷면 바코드를 찍어 첫 책을 담아 보세요.'), findsOneWidget);
+
+    await tester.tap(find.widgetWithText(FilledButton, '바코드 찍기'));
+    await tester.pumpAndSettle();
+    expect(find.byType(ScanScreen), findsOneWidget);
+  });
+
+  testWidgets('로그아웃은 확인을 받은 뒤에만 한다', (tester) async {
+    await pumpApp(tester, api);
+    await tester.tap(find.byKey(const Key('logout')));
+    await tester.pumpAndSettle();
+    expect(find.text('로그아웃할까요?'), findsOneWidget);
+
+    await tester.tap(find.text('취소'));
+    await tester.pumpAndSettle();
+    expect(find.text('소년이 온다'), findsOneWidget);
+    expect(api.calls, isNot(contains('logout')));
+
+    await confirmLogout(tester);
+    expect(find.text('개발 로그인'), findsOneWidget);
+    expect(api.calls, contains('logout'));
   });
 
   testWidgets('서재에서 기록을 누르면 편집 화면으로 간다', (tester) async {
@@ -109,8 +181,7 @@ void main() {
     await pumpApp(tester, api);
     expect(find.text('소년이 온다'), findsOneWidget);
 
-    await tester.tap(find.byKey(const Key('logout')));
-    await tester.pumpAndSettle();
+    await confirmLogout(tester);
     await tester.enterText(find.byType(TextField), 'dev-other');
     await tester.tap(find.text('개발 로그인'));
     await tester.pumpAndSettle();
@@ -137,8 +208,7 @@ void main() {
     );
     final store = MemoryTokenStore(const Tokens(access: 'a', refresh: 'r'));
     await pumpApp(tester, api, store: store);
-    await tester.tap(find.byKey(const Key('logout')));
-    await tester.pumpAndSettle();
+    await confirmLogout(tester);
 
     expect(find.text('개발 로그인'), findsOneWidget);
     expect(await store.read(), isNull);
