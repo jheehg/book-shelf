@@ -39,6 +39,8 @@ services:
       # .p8 내용을 한 줄로 — 줄바꿈을 |로 바꿔 넣는다. 앱이 되돌린다 (AppleProperties.privateKeyPem)
       APPLE_PRIVATE_KEY: ${APPLE_PRIVATE_KEY:?APPLE_PRIVATE_KEY를 지정해야 한다}
       LIBRARY_API_KEY: ${LIBRARY_API_KEY:?LIBRARY_API_KEY를 지정해야 한다 (정보나루 인증키)}
+      # Google Cloud 콘솔에서 이 서버 IP만 허용하도록 제한한다 (설계 8장)
+      GOOGLE_BOOKS_KEY: ${GOOGLE_BOOKS_KEY:?GOOGLE_BOOKS_KEY를 지정해야 한다 (Google Books API 키)}
       SITE_URL: "${SITE_URL:?SITE_URL을 지정해야 한다 (예 https://example.com)}"   # 따옴표: 값 안의 ": "를 YAML이 키로 읽는다
       # 평소에는 비워 둔다. 카카오 장애를 흉내 낼 때만 덮는다 (deploy/README.md)
       KAKAO_BASE_URL: ${KAKAO_BASE_URL:-https://dapi.kakao.com}

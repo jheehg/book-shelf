@@ -44,6 +44,7 @@ APPLE_TEAM_ID=<Apple Team ID>
 APPLE_KEY_ID=<Sign in with Apple 키 ID>
 APPLE_PRIVATE_KEY="<AuthKey_XXXX.p8 내용, 줄바꿈을 |로>"
 LIBRARY_API_KEY=<정보나루 인증키>
+GOOGLE_BOOKS_KEY=<Google Books API 키 — 콘솔에서 서버 IP만 허용>
 ENV
 chmod 600 .env
 
