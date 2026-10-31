@@ -18,7 +18,7 @@ void main() {
 
   Future<void> openTypedIsbnDialog(WidgetTester tester) async {
     await pumpApp(tester, api);
-    await tester.tap(find.byIcon(Icons.qr_code_scanner));
+    await tester.tap(find.text('바코드로 담기'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('ISBN 직접 입력'));
     await tester.pumpAndSettle();
@@ -29,7 +29,7 @@ void main() {
 
   testWidgets('카메라 화면이 뜨기 전에는 조준 틀 없이 직접 입력만 보인다', (tester) async {
     await pumpApp(tester, api);
-    await tester.tap(find.byIcon(Icons.qr_code_scanner));
+    await tester.tap(find.text('바코드로 담기'));
     await tester.pumpAndSettle();
     expect(find.text('책 뒷면 바코드를 틀 안에 맞춰 주세요'), findsNothing);
     expect(find.text('ISBN 직접 입력'), findsOneWidget);

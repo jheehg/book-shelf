@@ -124,10 +124,12 @@ void main() {
     );
   });
 
-  testWidgets('서재 상단 버튼으로 완독 달력을 연다', (tester) async {
+  testWidgets('서재 메뉴에서 완독 달력을 연다', (tester) async {
     await openCalendar(tester, api, location: '/');
 
-    await tester.tap(find.byTooltip('완독 달력'));
+    await tester.tap(find.byTooltip('서재 메뉴'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('완독 달력'));
     await tester.pumpAndSettle();
 
     expect(find.text('완독 달력'), findsOneWidget);

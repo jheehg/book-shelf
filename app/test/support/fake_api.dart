@@ -229,6 +229,7 @@ RecordItem record(
   String? title,
   int? rating,
   String? review,
+  String? finishedAt,
 }) => RecordItem(
   id: id,
   isbn13: isbn,
@@ -236,5 +237,6 @@ RecordItem record(
   visibility: RecordVisibility.private,
   rating: rating,
   review: review,
+  finishedAt: finishedAt,
   book: title == null ? null : Book(isbn13: isbn, title: title, author: '저자'),
 );

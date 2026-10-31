@@ -6,6 +6,7 @@ abstract final class AppColors {
   static const muted = Color(0xFF74746F);
   static const bodyMuted = Color(0xFF5F5F5B);
   static const surface = Color(0xFFFFFFFF);
+  static const raised = Color(0xFFF8F8F6);
   static const lavender = Color(0xFFAB9DFF);
   static const tomato = Color(0xFFF2643C);
   static const taupe = Color(0xFFD6CABB);
