@@ -108,7 +108,7 @@ set -a && . ./.env && set +a && ./gradlew bootRun
 로컬에서는 Apple 로그인 없이 개발 로그인을 활성화할 수 있습니다. 백그라운드 작업도 함께 끌 수 있습니다.
 
 ```bash
-set -a && . ./.env && set +a \\
+set -a && . ./.env && set +a && \
   DEV_LOGIN_ENABLED=true BACKGROUND_JOBS_ENABLED=false ./gradlew bootRun
 ```
 

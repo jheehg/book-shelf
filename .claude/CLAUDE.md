@@ -9,6 +9,6 @@
 ```bash
 docker compose up -d
 set -a && . ./.env && set +a && ./gradlew bootRun
-set -a && . ./.env && set +a DEV_LOGIN_ENABLED=true BACKGROUND_JOBS_ENABLED=false ./gradlew bootRun
+set -a && . ./.env && set +a && DEV_LOGIN_ENABLED=true BACKGROUND_JOBS_ENABLED=false ./gradlew bootRun
 ./gradlew test
 ```
