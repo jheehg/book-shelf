@@ -92,6 +92,39 @@ void main() {
     expect(find.text('내 도서관 1/3'), findsOneWidget);
   });
 
+  testWidgets('저장 횟수 안내는 바꾼 내용이 있을 때만 보여준다', (tester) async {
+    const limitHint = '저장은 하루 3번까지예요. 다 고른 뒤에 저장해 주세요.';
+    api.myLibraryList = [seoul[0]];
+    await pumpApp(tester, api, initialLocation: '/libraries');
+    expect(find.text(limitHint), findsNothing);
+
+    await chooseSeoul(tester);
+    await tester.tap(find.widgetWithText(ListTile, '강동도서관'));
+    await tester.pumpAndSettle();
+    expect(find.text(limitHint), findsOneWidget);
+
+    await tester.tap(find.widgetWithText(ListTile, '강동도서관'));
+    await tester.pumpAndSettle();
+    expect(find.text(limitHint), findsNothing);
+  });
+
+  testWidgets('지역 선택은 테두리와 이름표가 있는 첫 단계로 보인다', (tester) async {
+    await pumpApp(tester, api, initialLocation: '/libraries');
+
+    expect(
+      find.descendant(
+        of: find.byKey(const Key('region')),
+        matching: find.byWidgetPredicate(
+          (widget) =>
+              widget is InputDecorator &&
+              widget.decoration.labelText == '지역' &&
+              widget.decoration.border is OutlineInputBorder,
+        ),
+      ),
+      findsOneWidget,
+    );
+  });
+
   testWidgets('이름으로 좁혀 찾는다', (tester) async {
     await pumpApp(tester, api, initialLocation: '/libraries');
     await chooseSeoul(tester);

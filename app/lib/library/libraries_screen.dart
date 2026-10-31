@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -75,6 +76,12 @@ class _LibrariesScreenState extends ConsumerState<LibrariesScreen> {
       _selected = [...mine.value];
     }
     final selected = _selected ?? const <Library>[];
+    final unsaved =
+        mine.hasValue &&
+        !listEquals(
+          [for (final library in selected) library.libCode],
+          [for (final library in mine.value!) library.libCode],
+        );
     final regions = ref.watch(regionsProvider);
 
     return Scaffold(
@@ -115,10 +122,12 @@ class _LibrariesScreenState extends ConsumerState<LibrariesScreen> {
               ],
             ),
           ),
-          const Padding(
-            padding: EdgeInsets.fromLTRB(16, 4, 16, 8),
-            child: Text('저장은 하루 3번까지예요. 다 고른 뒤에 저장해 주세요.'),
-          ),
+          if (unsaved)
+            const Padding(
+              padding: EdgeInsets.fromLTRB(16, 4, 16, 0),
+              child: Text('저장은 하루 3번까지예요. 다 고른 뒤에 저장해 주세요.'),
+            ),
+          const SizedBox(height: 12),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(
@@ -130,18 +139,25 @@ class _LibrariesScreenState extends ConsumerState<LibrariesScreen> {
                     child: CircularProgressIndicator(strokeWidth: 2),
                   ),
                   error: (_, _) => const Text('지역을 불러오지 못했어요'),
-                  data: (list) => DropdownButton<int>(
-                    key: const Key('region'),
-                    hint: const Text('지역'),
-                    value: _region,
-                    items: [
-                      for (final region in list)
-                        DropdownMenuItem(
-                          value: region.code,
-                          child: Text(region.label),
-                        ),
-                    ],
-                    onChanged: (value) => setState(() => _region = value),
+                  data: (list) => SizedBox(
+                    width: 120,
+                    child: DropdownButtonFormField<int>(
+                      key: const Key('region'),
+                      initialValue: _region,
+                      decoration: const InputDecoration(
+                        labelText: '지역',
+                        border: OutlineInputBorder(),
+                        isDense: true,
+                      ),
+                      items: [
+                        for (final region in list)
+                          DropdownMenuItem(
+                            value: region.code,
+                            child: Text(region.label),
+                          ),
+                      ],
+                      onChanged: (value) => setState(() => _region = value),
+                    ),
                   ),
                 ),
                 const SizedBox(width: 12),

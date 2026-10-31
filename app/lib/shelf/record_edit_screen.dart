@@ -268,16 +268,19 @@ class _RecordEditScreenState extends ConsumerState<RecordEditScreen> {
                 child: Text(_finishedAt ?? '다 읽은 날'),
               ),
             ),
-            IconButton(
-              tooltip: '날짜 지우기',
-              icon: const Icon(Icons.clear),
+          ],
+        ),
+        if (_startedAt != null || _finishedAt != null)
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton(
               onPressed: () => setState(() {
                 _startedAt = null;
                 _finishedAt = null;
               }),
+              child: const Text('날짜 지우기'),
             ),
-          ],
-        ),
+          ),
         if (problem != null)
           Padding(
             padding: const EdgeInsets.only(top: 8),

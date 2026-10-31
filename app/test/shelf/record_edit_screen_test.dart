@@ -119,6 +119,31 @@ void main() {
     );
   });
 
+  testWidgets('날짜가 없으면 날짜 지우기를 보여주지 않는다', (tester) async {
+    await pumpApp(tester, api, initialLocation: '/record/1');
+    expect(find.text('날짜 지우기'), findsNothing);
+  });
+
+  testWidgets('날짜 지우기는 두 날짜를 지우고 사라진다', (tester) async {
+    api.recordsBySlug['mine'] = [
+      RecordItem(
+        id: 1,
+        isbn13: '9788936434120',
+        status: ReadingStatus.done,
+        visibility: RecordVisibility.private,
+        startedAt: '2026-09-01',
+        finishedAt: '2026-09-20',
+      ),
+    ];
+    await pumpApp(tester, api, initialLocation: '/record/1');
+    await tester.tap(find.widgetWithText(TextButton, '날짜 지우기'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('시작한 날'), findsOneWidget);
+    expect(find.text('다 읽은 날'), findsOneWidget);
+    expect(find.text('날짜 지우기'), findsNothing);
+  });
+
   testWidgets('API 오류는 안내하고 입력 화면에 남는다', (tester) async {
     api.onUpdateRecord = (id, update) async => throw const ApiException(
       statusCode: 503,
