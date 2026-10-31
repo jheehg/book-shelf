@@ -46,3 +46,6 @@ app.*.map.json
 
 # Widget Preview related
 .widget_preview/
+
+# 개인 Apple 팀 ID (무료 서명). 퍼블릭 레포에 올리지 않는다
+ios/Flutter/Signing.xcconfig
