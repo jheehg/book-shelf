@@ -14,7 +14,7 @@ class BookDetailScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => Scaffold(
-    appBar: AppBar(title: const Text('책')),
+    appBar: AppBar(),
     body: RefreshIndicator(
       onRefresh: () async {
         ref.invalidate(bookDetailProvider(isbn));

@@ -33,14 +33,21 @@ class RecordBar extends ConsumerWidget {
     }
     return Padding(
       padding: const EdgeInsets.only(top: 12),
-      child: Wrap(
-        spacing: 8,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          for (final status in ReadingStatus.values)
-            FilledButton.tonal(
-              onPressed: () => _create(context, ref, status),
-              child: Text(status.label),
-            ),
+          Text('내 서재에 담기', style: Theme.of(context).textTheme.titleSmall),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 8,
+            children: [
+              for (final status in ReadingStatus.values)
+                FilledButton.tonal(
+                  onPressed: () => _create(context, ref, status),
+                  child: Text(status.label),
+                ),
+            ],
+          ),
         ],
       ),
     );

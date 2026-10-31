@@ -20,7 +20,7 @@ class BorrowSection extends ConsumerWidget {
       children: [
         holdings.when(
           loading: () => const LinearProgressIndicator(),
-          error: (_, _) => const Text('확인 불가'),
+          error: (_, _) => const Text('확인 불가 · 당겨서 다시 시도'),
           data: (list) => list.isEmpty
               ? Row(
                   children: [

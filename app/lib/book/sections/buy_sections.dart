@@ -18,12 +18,19 @@ class _Links extends StatelessWidget {
     runSpacing: 4,
     children: [
       for (final link in links)
-        OutlinedButton(
+        OutlinedButton.icon(
           onPressed: () => launchUrl(
             Uri.parse(link.url),
             mode: LaunchMode.externalApplication,
           ),
-          child: Text('${link.name}에서 찾기'),
+          style: OutlinedButton.styleFrom(
+            visualDensity: VisualDensity.compact,
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            iconSize: 14,
+            iconAlignment: IconAlignment.end,
+          ),
+          icon: const Icon(Icons.open_in_new),
+          label: Text(link.name),
         ),
     ],
   );
@@ -42,6 +49,13 @@ Widget _linksOf(
           ? const Text('책 정보가 없어 서점 링크를 만들 수 없어요')
           : _Links(select(links)),
     );
+
+/// 새 책 칸이 서점 링크를 만들 수 없다고 한 번 알리므로 나머지 구매 칸은 숨긴다.
+bool _noBookInfo(WidgetRef ref, String isbn) =>
+    switch (ref.watch(linksProvider(isbn))) {
+      AsyncData(value: null) => true,
+      _ => false,
+    };
 
 class NewBookSection extends ConsumerWidget {
   const NewBookSection({super.key, required this.isbn});
@@ -66,7 +80,7 @@ class NewBookSection extends ConsumerWidget {
               if (sale.fetchedAt != null && price != null) Text(price),
             ],
           ),
-        if (detail.hasError) const Text('확인 불가'),
+        if (detail.hasError) const Text('확인 불가 · 당겨서 다시 시도'),
         const SizedBox(height: 8),
         _linksOf(ref, isbn, (links) => links.newBooks),
       ],
@@ -80,10 +94,13 @@ class UsedSection extends ConsumerWidget {
   final String isbn;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) => DetailSection(
-    title: '중고',
-    children: [_linksOf(ref, isbn, (links) => links.used)],
-  );
+  Widget build(BuildContext context, WidgetRef ref) {
+    if (_noBookInfo(ref, isbn)) return const SizedBox.shrink();
+    return DetailSection(
+      title: '중고',
+      children: [_linksOf(ref, isbn, (links) => links.used)],
+    );
+  }
 }
 
 class EbookSection extends ConsumerWidget {
@@ -93,6 +110,7 @@ class EbookSection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    if (_noBookInfo(ref, isbn)) return const SizedBox.shrink();
     final ebook = ref.watch(ebookProvider(isbn));
     final now = ref.watch(nowProvider)();
     final value = ebook.value;
@@ -112,11 +130,11 @@ class EbookSection extends ConsumerWidget {
               child: CircularProgressIndicator(strokeWidth: 2),
             ),
           ),
-          error: (_, _) => const Text('가격 확인 불가'),
+          error: (_, _) => const Text('가격 확인 불가 · 당겨서 다시 시도'),
           data: (offer) {
             if (offer == null || !offer.matched) {
               return offer?.status == 'UNKNOWN'
-                  ? const Text('가격 확인 불가')
+                  ? const Text('가격 확인 불가 · 당겨서 다시 시도')
                   : const SizedBox.shrink();
             }
             final price = priceLabel(offer.price);
