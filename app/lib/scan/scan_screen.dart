@@ -43,32 +43,10 @@ class _ScanScreenState extends State<ScanScreen> {
   }
 
   Future<void> _typeIsbn() async {
-    final text = TextEditingController();
     final isbn = await showDialog<String>(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('ISBN 직접 입력'),
-        content: TextField(
-          controller: text,
-          keyboardType: TextInputType.number,
-          decoration: const InputDecoration(hintText: '13자리'),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('취소'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(
-              dialogContext,
-              text.text.replaceAll('-', '').trim(),
-            ),
-            child: const Text('열기'),
-          ),
-        ],
-      ),
+      builder: (_) => const _TypedIsbnDialog(),
     );
-    text.dispose();
     if (isbn == null || !mounted) return;
     if (isBookIsbn13(isbn)) {
       context.pushReplacement('/book/$isbn');
@@ -85,5 +63,45 @@ class _ScanScreenState extends State<ScanScreen> {
       actions: [TextButton(onPressed: _typeIsbn, child: const Text('직접 입력'))],
     ),
     body: MobileScanner(controller: _controller, onDetect: _onDetect),
+  );
+}
+
+/// 입력 컨트롤러는 대화상자가 갖는다. showDialog의 await는 닫히는 애니메이션이 끝나기 전에 돌아오므로,
+/// 호출한 쪽에서 버리면 닫히는 동안 버려진 컨트롤러를 그린다.
+class _TypedIsbnDialog extends StatefulWidget {
+  const _TypedIsbnDialog();
+
+  @override
+  State<_TypedIsbnDialog> createState() => _TypedIsbnDialogState();
+}
+
+class _TypedIsbnDialogState extends State<_TypedIsbnDialog> {
+  final _text = TextEditingController();
+
+  @override
+  void dispose() {
+    _text.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => AlertDialog(
+    title: const Text('ISBN 직접 입력'),
+    content: TextField(
+      controller: _text,
+      keyboardType: TextInputType.number,
+      decoration: const InputDecoration(hintText: '13자리'),
+    ),
+    actions: [
+      TextButton(
+        onPressed: () => Navigator.pop(context),
+        child: const Text('취소'),
+      ),
+      TextButton(
+        onPressed: () =>
+            Navigator.pop(context, _text.text.replaceAll('-', '').trim()),
+        child: const Text('열기'),
+      ),
+    ],
   );
 }
