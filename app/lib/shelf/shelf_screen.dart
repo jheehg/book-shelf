@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../api/models.dart';
-import '../auth/auth_controller.dart';
 import '../widgets/cover.dart';
 import 'records_provider.dart';
 
@@ -16,26 +15,6 @@ class ShelfScreen extends ConsumerStatefulWidget {
 
 class _ShelfScreenState extends ConsumerState<ShelfScreen> {
   ReadingStatus? _filter;
-
-  Future<void> _confirmLogout() async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('로그아웃할까요?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('취소'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('로그아웃'),
-          ),
-        ],
-      ),
-    );
-    if (confirmed == true) await ref.read(authProvider.notifier).logout();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,10 +35,9 @@ class _ShelfScreenState extends ConsumerState<ShelfScreen> {
             onPressed: () => context.push('/libraries'),
           ),
           IconButton(
-            key: const Key('logout'),
-            tooltip: '로그아웃',
-            icon: const Icon(Icons.logout),
-            onPressed: _confirmLogout,
+            tooltip: '설정',
+            icon: const Icon(Icons.settings_outlined),
+            onPressed: () => context.push('/settings'),
           ),
         ],
       ),

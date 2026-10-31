@@ -33,7 +33,10 @@ void main() {
   });
 
   Future<void> confirmLogout(WidgetTester tester) async {
-    await tester.tap(find.byKey(const Key('logout')));
+    await tester.tap(find.byTooltip('설정'));
+    await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(find.text('로그아웃'), 200);
+    await tester.tap(find.text('로그아웃'));
     await tester.pumpAndSettle();
     await tester.tap(find.widgetWithText(TextButton, '로그아웃'));
     await tester.pumpAndSettle();
@@ -94,6 +97,16 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('내 도서관 0/3'), findsOneWidget);
+  });
+
+  testWidgets('서재에서 설정 화면으로 이동할 수 있다', (tester) async {
+    await pumpApp(tester, api);
+
+    await tester.tap(find.byTooltip('설정'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('설정'), findsOneWidget);
+    expect(find.text('서재 주소'), findsOneWidget);
   });
 
   testWidgets('읽기 상태로 거른다', (tester) async {
@@ -186,22 +199,6 @@ void main() {
     final lastRow = tester.getRect(find.widgetWithText(ListTile, '책 15'));
     final fab = tester.getRect(find.byType(FloatingActionButton));
     expect(lastRow.overlaps(fab), isFalse);
-  });
-
-  testWidgets('로그아웃은 확인을 받은 뒤에만 한다', (tester) async {
-    await pumpApp(tester, api);
-    await tester.tap(find.byKey(const Key('logout')));
-    await tester.pumpAndSettle();
-    expect(find.text('로그아웃할까요?'), findsOneWidget);
-
-    await tester.tap(find.text('취소'));
-    await tester.pumpAndSettle();
-    expect(find.text('소년이 온다'), findsOneWidget);
-    expect(api.calls, isNot(contains('logout')));
-
-    await confirmLogout(tester);
-    expect(find.text('개발 로그인'), findsOneWidget);
-    expect(api.calls, contains('logout'));
   });
 
   testWidgets('서재에서 기록을 누르면 편집 화면으로 간다', (tester) async {

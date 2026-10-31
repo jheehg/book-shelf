@@ -8,6 +8,7 @@ import 'book/book_detail_screen.dart';
 import 'library/libraries_screen.dart';
 import 'scan/scan_screen.dart';
 import 'search/search_screen.dart';
+import 'settings/settings_screen.dart';
 import 'shelf/record_edit_screen.dart';
 import 'shelf/shelf_screen.dart';
 
@@ -29,6 +30,7 @@ final List<RouteBase> appRoutes = [
         BookDetailScreen(isbn: state.pathParameters['isbn']!),
   ),
   GoRoute(path: '/libraries', builder: (_, _) => const LibrariesScreen()),
+  GoRoute(path: '/settings', builder: (_, _) => const SettingsScreen()),
   GoRoute(
     path: '/record/:id',
     builder: (_, state) =>

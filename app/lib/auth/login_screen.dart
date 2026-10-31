@@ -27,7 +27,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     if (_busy) return;
     final slug = _slug.text.trim();
     if (!slugPattern.hasMatch(slug)) {
-      setState(() => _error = '소문자·숫자·하이픈 3~30자로 적어 주세요');
+      setState(() => _error = slugRule);
       return;
     }
     setState(() {

@@ -9,6 +9,7 @@ enum AuthStatus { unknown, signedIn, signedOut }
 
 /// 서버 Member.SLUG와 같은 규칙이다.
 final slugPattern = RegExp(r'^[a-z0-9][a-z0-9-]{1,28}[a-z0-9]$');
+const slugRule = '소문자·숫자·하이픈 3~30자로 적어 주세요';
 
 class AuthController extends Notifier<AuthStatus> {
   @override
@@ -35,16 +36,20 @@ class AuthController extends Notifier<AuthStatus> {
 
   /// 서버 요청에 실패해도 기기의 토큰과 인증 상태는 지운다.
   Future<void> logout() async {
-    final store = ref.read(tokenStoreProvider);
-    final tokens = await store.read();
+    final tokens = await ref.read(tokenStoreProvider).read();
     try {
       if (tokens != null) await ref.read(apiProvider).logout(tokens.refresh);
     } on ApiException {
       // 오프라인이어도 로컬 로그아웃은 계속한다.
     } finally {
-      await store.clear();
-      state = AuthStatus.signedOut;
+      await signOutLocally();
     }
+  }
+
+  /// 계정을 지운 뒤에는 서버 세션이 이미 없어 서버 로그아웃을 부르지 않는다.
+  Future<void> signOutLocally() async {
+    await ref.read(tokenStoreProvider).clear();
+    state = AuthStatus.signedOut;
   }
 
   void signedOutByServer() => state = AuthStatus.signedOut;

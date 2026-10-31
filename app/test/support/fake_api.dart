@@ -19,13 +19,10 @@ class FakeApi implements BookShelfApi {
   Future<RecordItem> Function(int id, RecordUpdate update)? onUpdateRecord;
   Future<List<Library>> Function(List<String> codes)? onSetMyLibraries;
   Future<List<Library>> Function(int region, String? query)? onLibraries;
-  Me Function()? onMe;
-  Me Function({
-    String? slug,
-    String? displayName,
-    RecordVisibility? defaultVisibility,
-  })?
-  onUpdateMe;
+  String? slug;
+  String displayName = '나';
+  RecordVisibility defaultVisibility = RecordVisibility.private;
+  Future<void> Function()? onUpdateMe;
   Future<void> Function()? onDeleteAccount;
   List<Library> myLibraryList = [];
   List<Region> regionList = const [
@@ -59,16 +56,17 @@ class FakeApi implements BookShelfApi {
     await onLogout?.call();
   }
 
+  Me get currentMe => Me(
+    slug: slug ?? loggedInSlug ?? 'mine',
+    displayName: displayName,
+    shelfPublic: shelfState.shelfPublic,
+    defaultVisibility: defaultVisibility,
+  );
+
   @override
   Future<Me> me() async {
     calls.add('me');
-    return onMe?.call() ??
-        Me(
-          slug: loggedInSlug ?? 'mine',
-          displayName: '나',
-          shelfPublic: shelfState.shelfPublic,
-          defaultVisibility: RecordVisibility.private,
-        );
+    return currentMe;
   }
 
   @override
@@ -77,18 +75,15 @@ class FakeApi implements BookShelfApi {
     String? displayName,
     RecordVisibility? defaultVisibility,
   }) async {
-    calls.add('updateMe');
-    return onUpdateMe?.call(
-          slug: slug,
-          displayName: displayName,
-          defaultVisibility: defaultVisibility,
-        ) ??
-        Me(
-          slug: slug ?? loggedInSlug ?? 'mine',
-          displayName: displayName ?? '나',
-          shelfPublic: false,
-          defaultVisibility: defaultVisibility ?? RecordVisibility.private,
-        );
+    calls.add(
+      'updateMe:${slug ?? ''}:${displayName ?? ''}:'
+      '${defaultVisibility?.wire ?? ''}',
+    );
+    await onUpdateMe?.call();
+    this.slug = slug ?? this.slug;
+    this.displayName = displayName ?? this.displayName;
+    this.defaultVisibility = defaultVisibility ?? this.defaultVisibility;
+    return currentMe;
   }
 
   @override
