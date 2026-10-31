@@ -3,6 +3,7 @@ package com.bookshelf.member.application;
 import com.bookshelf.auth.application.UnauthorizedException;
 import com.bookshelf.common.ConflictException;
 import com.bookshelf.member.domain.Member;
+import com.bookshelf.member.infrastructure.persistence.ActiveMemberLock;
 import com.bookshelf.member.infrastructure.persistence.MemberRepository;
 import com.bookshelf.record.domain.Visibility;
 import org.springframework.stereotype.Service;
@@ -12,9 +13,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class MemberService {
 
     private final MemberRepository members;
+    private final ActiveMemberLock memberLock;
 
-    public MemberService(MemberRepository members) {
+    public MemberService(MemberRepository members, ActiveMemberLock memberLock) {
         this.members = members;
+        this.memberLock = memberLock;
     }
 
     /** access 토큰은 30분 동안 유효하다. 그 사이 탈퇴했으면 토큰이 남아 있어도 통하지 않게 한다 */
@@ -31,6 +34,8 @@ public class MemberService {
     /** slug를 바꾸면 옛 서재 링크는 404가 된다 — 앱이 바꾸기 전에 알린다. null인 필드는 그대로 둔다 */
     @Transactional
     public MeView update(long memberId, String slug, String displayName, Visibility defaultVisibility) {
+        // 잠그지 않고 읽으면 진행 중인 탈퇴 뒤에 탈퇴 전 값으로 행 전체를 덮어써 회원이 되살아난다
+        memberLock.lock(memberId);
         Member m = active(memberId);
         if (slug != null && !slug.equals(m.getSlug())) {
             if (members.existsBySlug(slug)) {

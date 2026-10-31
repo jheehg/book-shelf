@@ -52,6 +52,7 @@ public class ShelfService {
     /** 기록의 visibility는 그대로 둔다. 다시 열면 닫기 전처럼 보인다. */
     @Transactional
     public ShelfView close(long memberId) {
+        memberLock.lock(memberId);   // publish와 같다 — 탈퇴와 겹치면 멈춘다
         Member member = members.active(memberId);
         member.closeShelf();
         return view(member);
