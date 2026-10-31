@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'auth/auth_controller.dart';
 import 'auth/login_screen.dart';
 import 'book/book_detail_screen.dart';
+import 'calendar/calendar_screen.dart';
 import 'library/libraries_screen.dart';
 import 'scan/scan_screen.dart';
 import 'search/search_screen.dart';
@@ -31,6 +32,7 @@ final List<RouteBase> appRoutes = [
   ),
   GoRoute(path: '/libraries', builder: (_, _) => const LibrariesScreen()),
   GoRoute(path: '/settings', builder: (_, _) => const SettingsScreen()),
+  GoRoute(path: '/calendar', builder: (_, _) => const CalendarScreen()),
   GoRoute(
     path: '/record/:id',
     builder: (_, state) =>

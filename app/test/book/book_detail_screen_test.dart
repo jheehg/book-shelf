@@ -174,6 +174,8 @@ void main() {
 
     await tester.tap(find.text('읽음'));
     await tester.pumpAndSettle();
+    await tester.tap(find.text('기억 안 나요'));
+    await tester.pumpAndSettle();
     expect(api.calls, contains('createRecord:$isbn:DONE'));
   });
 
@@ -239,5 +241,107 @@ void main() {
     await openBook(tester, api);
 
     expect(inSection('빌리기', find.textContaining('도서관을 등록하면')), findsOneWidget);
+  });
+
+  group('읽음으로 담기', () {
+    late FakeApi api;
+    late List<(int, RecordUpdate)> updates;
+
+    setUp(() {
+      updates = [];
+      api = happyApi()
+        ..onUpdateRecord = (id, update) async {
+          updates.add((id, update));
+          return RecordItem(
+            id: id,
+            isbn13: isbn,
+            status: update.status,
+            visibility: update.visibility,
+            finishedAt: update.finishedAt,
+          );
+        };
+    });
+
+    Future<void> tapDone(WidgetTester tester) async {
+      await openBook(tester, api);
+      await tester.tap(find.text('읽음'));
+      await tester.pumpAndSettle();
+    }
+
+    Future<void> choose(WidgetTester tester, String choice) async {
+      await tester.tap(find.text(choice));
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('읽음은 담기 전에 언제 다 읽었는지 묻는다', (tester) async {
+      await tapDone(tester);
+
+      expect(find.text('언제 다 읽었어요?'), findsOneWidget);
+      expect(api.calls.where((c) => c.startsWith('createRecord')), isEmpty);
+    });
+
+    testWidgets('오늘을 고르면 다 읽음으로 담고 오늘을 다 읽은 날로 남긴다', (tester) async {
+      await tapDone(tester);
+      await choose(tester, '오늘');
+
+      expect(api.calls, contains('createRecord:$isbn:DONE'));
+      expect(updates, hasLength(1));
+      final (id, update) = updates.single;
+      expect(id, 99);
+      expect(update.status, ReadingStatus.done);
+      expect(update.visibility, RecordVisibility.private);
+      expect(update.finishedAt, '2026-10-02');
+    });
+
+    testWidgets('날짜를 고르면 그 날을 다 읽은 날로 남긴다', (tester) async {
+      await tapDone(tester);
+      await choose(tester, '날짜 고르기');
+      await tester.tap(find.text('1'));
+      await tester.tap(find.text('OK'));
+      await tester.pumpAndSettle();
+
+      expect(api.calls, contains('createRecord:$isbn:DONE'));
+      expect(updates.single.$2.finishedAt, '2026-10-01');
+    });
+
+    testWidgets('기억 안 나요는 날짜 없이 다 읽음으로 담는다', (tester) async {
+      await tapDone(tester);
+      await choose(tester, '기억 안 나요');
+
+      expect(api.calls, contains('createRecord:$isbn:DONE'));
+      expect(updates, isEmpty);
+    });
+
+    testWidgets('묻는 창을 닫으면 아무것도 담지 않는다', (tester) async {
+      await tapDone(tester);
+      await tester.tapAt(const Offset(10, 10));
+      await tester.pumpAndSettle();
+
+      expect(find.text('언제 다 읽었어요?'), findsNothing);
+      expect(api.calls.where((c) => c.startsWith('createRecord')), isEmpty);
+    });
+
+    testWidgets('날짜를 남기지 못하면 담은 것은 두고 고치기를 안내한다', (tester) async {
+      api.onUpdateRecord = (id, update) => throw const ApiException(
+        statusCode: 503,
+        code: 'TRY_LATER',
+        message: '잠시 후 다시 시도해 주세요',
+      );
+      await tapDone(tester);
+      await choose(tester, '오늘');
+
+      expect(api.calls, contains('createRecord:$isbn:DONE'));
+      expect(find.text('기록은 담았어요. 다 읽은 날은 기록 고치기에서 넣어 주세요.'), findsOneWidget);
+    });
+
+    testWidgets('읽고 싶다는 묻지 않고 바로 담는다', (tester) async {
+      await openBook(tester, api);
+      await tester.tap(find.text('읽고 싶다'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('언제 다 읽었어요?'), findsNothing);
+      expect(api.calls, contains('createRecord:$isbn:WANT'));
+      expect(updates, isEmpty);
+    });
   });
 }
