@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 import '../api/api_error.dart';
 import '../api/models.dart';
 import '../api/providers.dart';
+import '../book/book_providers.dart';
+import 'finish_date_sheet.dart';
 import 'records_provider.dart';
 import 'review_length.dart';
 
@@ -123,19 +125,37 @@ class _RecordEditScreenState extends ConsumerState<RecordEditScreen> {
     }
   }
 
+  Future<void> _changeStatus(ReadingStatus status) async {
+    if (status != ReadingStatus.done || _finishedAt != null) {
+      setState(() => _status = status);
+      return;
+    }
+    final answer = await askFinishDate(context, ref.read(nowProvider)());
+    if (!mounted) return;
+    switch (answer) {
+      case FinishCancelled():
+        return;
+      case FinishedUndated():
+        setState(() => _status = status);
+      case FinishedOn(:final day):
+        setState(() {
+          _status = status;
+          _finishedAt = day;
+        });
+    }
+  }
+
   Future<void> _pickDate({required bool started}) async {
     final current = started ? _startedAt : _finishedAt;
+    final now = ref.read(nowProvider)();
     final picked = await showDatePicker(
       context: context,
-      initialDate: current == null ? DateTime.now() : DateTime.parse(current),
+      initialDate: current == null ? now : DateTime.parse(current),
       firstDate: DateTime(1900),
-      lastDate: DateTime.now(),
+      lastDate: now,
     );
     if (picked == null || !mounted) return;
-    final value =
-        '${picked.year.toString().padLeft(4, '0')}-'
-        '${picked.month.toString().padLeft(2, '0')}-'
-        '${picked.day.toString().padLeft(2, '0')}';
+    final value = dayString(picked);
     setState(() {
       if (started) {
         _startedAt = value;
@@ -200,8 +220,7 @@ class _RecordEditScreenState extends ConsumerState<RecordEditScreen> {
               ButtonSegment(value: status, label: Text(status.label)),
           ],
           selected: {_status},
-          onSelectionChanged: (selected) =>
-              setState(() => _status = selected.first),
+          onSelectionChanged: (selected) => _changeStatus(selected.first),
         ),
         const SizedBox(height: 16),
         Row(

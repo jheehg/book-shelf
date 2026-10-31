@@ -1,5 +1,6 @@
 import 'package:bookshelf/api/api_error.dart';
 import 'package:bookshelf/api/models.dart';
+import 'package:bookshelf/book/book_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -142,6 +143,115 @@ void main() {
     expect(find.text('시작한 날'), findsOneWidget);
     expect(find.text('다 읽은 날'), findsOneWidget);
     expect(find.text('날짜 지우기'), findsNothing);
+  });
+
+  Future<void> openReading(WidgetTester tester, {String? finishedAt}) async {
+    api.recordsBySlug['mine'] = [
+      RecordItem(
+        id: 1,
+        isbn13: '9788936434120',
+        status: ReadingStatus.reading,
+        visibility: RecordVisibility.private,
+        finishedAt: finishedAt,
+      ),
+    ];
+    await pumpApp(
+      tester,
+      api,
+      initialLocation: '/record/1',
+      overrides: [
+        nowProvider.overrideWithValue(() => DateTime(2026, 10, 31, 23)),
+      ],
+    );
+  }
+
+  Future<void> answer(WidgetTester tester, String choice) async {
+    await tester.tap(find.text('읽음'));
+    await tester.pumpAndSettle();
+    expect(find.text('언제 다 읽었어요?'), findsOneWidget);
+    await tester.tap(find.text(choice));
+    await tester.pumpAndSettle();
+  }
+
+  Future<void> save(WidgetTester tester) async {
+    await tester.tap(find.text('저장'));
+    await tester.pumpAndSettle();
+  }
+
+  testWidgets('다 읽음에서 오늘을 고르면 오늘을 다 읽은 날로 저장한다', (tester) async {
+    await openReading(tester);
+    await answer(tester, '오늘');
+    await save(tester);
+
+    expect(sent!.status, ReadingStatus.done);
+    expect(sent!.finishedAt, '2026-10-31');
+  });
+
+  testWidgets('다 읽음에서 날짜를 고르면 그 날을 저장한다', (tester) async {
+    await openReading(tester);
+    await answer(tester, '날짜 고르기');
+    await tester.tap(find.text('15'));
+    await tester.tap(find.text('OK'));
+    await tester.pumpAndSettle();
+    await save(tester);
+
+    expect(sent!.status, ReadingStatus.done);
+    expect(sent!.finishedAt, '2026-10-15');
+  });
+
+  testWidgets('기억 안 나요는 날짜 없이 다 읽음으로 저장한다', (tester) async {
+    await openReading(tester);
+    await answer(tester, '기억 안 나요');
+    await save(tester);
+
+    expect(sent!.status, ReadingStatus.done);
+    expect(sent!.finishedAt, isNull);
+  });
+
+  testWidgets('묻는 창을 닫으면 상태를 바꾸지 않는다', (tester) async {
+    await openReading(tester);
+    await tester.tap(find.text('읽음'));
+    await tester.pumpAndSettle();
+    await tester.tapAt(const Offset(10, 10));
+    await tester.pumpAndSettle();
+    expect(find.text('언제 다 읽었어요?'), findsNothing);
+    await save(tester);
+
+    expect(sent!.status, ReadingStatus.reading);
+    expect(sent!.finishedAt, isNull);
+  });
+
+  testWidgets('날짜 고르기를 취소하면 상태를 바꾸지 않는다', (tester) async {
+    await openReading(tester);
+    await answer(tester, '날짜 고르기');
+    await tester.tap(find.text('Cancel'));
+    await tester.pumpAndSettle();
+    await save(tester);
+
+    expect(sent!.status, ReadingStatus.reading);
+    expect(sent!.finishedAt, isNull);
+  });
+
+  testWidgets('다 읽은 날이 이미 있으면 묻지 않고 다 읽음으로 바꾼다', (tester) async {
+    await openReading(tester, finishedAt: '2026-09-01');
+    await tester.tap(find.text('읽음'));
+    await tester.pumpAndSettle();
+    expect(find.text('언제 다 읽었어요?'), findsNothing);
+    await save(tester);
+
+    expect(sent!.status, ReadingStatus.done);
+    expect(sent!.finishedAt, '2026-09-01');
+  });
+
+  testWidgets('다 읽음에서 다른 상태로 바꿔도 고른 날은 남는다', (tester) async {
+    await openReading(tester);
+    await answer(tester, '오늘');
+    await tester.tap(find.text('읽는 중'));
+    await tester.pumpAndSettle();
+    await save(tester);
+
+    expect(sent!.status, ReadingStatus.reading);
+    expect(sent!.finishedAt, '2026-10-31');
   });
 
   testWidgets('API 오류는 안내하고 입력 화면에 남는다', (tester) async {

@@ -51,6 +51,11 @@ class _ShelfScreenState extends ConsumerState<ShelfScreen> {
             onPressed: () => context.push('/search'),
           ),
           IconButton(
+            tooltip: '완독 달력',
+            icon: const Icon(Icons.calendar_month_outlined),
+            onPressed: () => context.push('/calendar'),
+          ),
+          IconButton(
             tooltip: '내 도서관',
             icon: const Icon(Icons.local_library_outlined),
             onPressed: () => context.push('/libraries'),
