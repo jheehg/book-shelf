@@ -68,13 +68,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                       icon: const Icon(Icons.close),
                       onPressed: _clear,
                     ),
-              filled: true,
-              fillColor: Theme.of(context).colorScheme.surfaceContainerHighest,
               isDense: true,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(28),
-                borderSide: BorderSide.none,
-              ),
             ),
             onChanged: (value) => _debouncer(
               () => ref.read(searchProvider.notifier).search(value),

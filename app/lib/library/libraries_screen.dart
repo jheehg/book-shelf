@@ -146,7 +146,6 @@ class _LibrariesScreenState extends ConsumerState<LibrariesScreen> {
                       initialValue: _region,
                       decoration: const InputDecoration(
                         labelText: '지역',
-                        border: OutlineInputBorder(),
                         isDense: true,
                       ),
                       items: [

@@ -111,7 +111,7 @@ void main() {
 
   testWidgets('읽기 상태로 거른다', (tester) async {
     await pumpApp(tester, api);
-    await tester.tap(find.widgetWithText(ChoiceChip, '읽고 싶다 1'));
+    await tester.tap(find.widgetWithText(ChoiceChip, '읽고 싶음 1'));
     await tester.pumpAndSettle();
     expect(find.text('소년이 온다'), findsNothing);
     expect(find.text('ISBN 9791100000007'), findsOneWidget);
@@ -124,7 +124,7 @@ void main() {
 
   testWidgets('거르기 칩에 상태별 권수를 보여준다', (tester) async {
     await pumpApp(tester, api);
-    for (final label in ['전체 2', '읽고 싶다 1', '읽는 중 0', '읽음 1']) {
+    for (final label in ['전체 2', '읽고 싶음 1', '읽는 중 0', '다 읽음 1']) {
       expect(find.widgetWithText(ChoiceChip, label), findsOneWidget);
     }
   });
@@ -151,8 +151,8 @@ void main() {
 
   testWidgets('기록에 저자와 상태, 별점을 함께 보여준다', (tester) async {
     await pumpApp(tester, api);
-    expect(find.text('저자 · 읽음 · ★★★★★'), findsOneWidget);
-    expect(find.text('읽고 싶다'), findsOneWidget);
+    expect(find.text('저자 · 다 읽음 · ★★★★★'), findsOneWidget);
+    expect(find.text('읽고 싶음'), findsOneWidget);
   });
 
   testWidgets('서재가 비어 있으면 바코드로 첫 책을 담도록 안내한다', (tester) async {

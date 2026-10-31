@@ -24,9 +24,9 @@ class AuthTokens {
 }
 
 enum ReadingStatus {
-  want('WANT', '읽고 싶다'),
+  want('WANT', '읽고 싶음'),
   reading('READING', '읽는 중'),
-  done('DONE', '읽음');
+  done('DONE', '다 읽음');
 
   const ReadingStatus(this.wire, this.label);
   final String wire;

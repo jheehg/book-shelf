@@ -166,7 +166,7 @@ void main() {
   }
 
   Future<void> answer(WidgetTester tester, String choice) async {
-    await tester.tap(find.text('읽음'));
+    await tester.tap(find.text('다 읽음'));
     await tester.pumpAndSettle();
     expect(find.text('언제 다 읽었어요?'), findsOneWidget);
     await tester.tap(find.text(choice));
@@ -191,7 +191,7 @@ void main() {
     await openReading(tester);
     await answer(tester, '날짜 고르기');
     await tester.tap(find.text('15'));
-    await tester.tap(find.text('OK'));
+    await tester.tap(find.text('확인'));
     await tester.pumpAndSettle();
     await save(tester);
 
@@ -210,7 +210,7 @@ void main() {
 
   testWidgets('묻는 창을 닫으면 상태를 바꾸지 않는다', (tester) async {
     await openReading(tester);
-    await tester.tap(find.text('읽음'));
+    await tester.tap(find.text('다 읽음'));
     await tester.pumpAndSettle();
     await tester.tapAt(const Offset(10, 10));
     await tester.pumpAndSettle();
@@ -224,7 +224,7 @@ void main() {
   testWidgets('날짜 고르기를 취소하면 상태를 바꾸지 않는다', (tester) async {
     await openReading(tester);
     await answer(tester, '날짜 고르기');
-    await tester.tap(find.text('Cancel'));
+    await tester.tap(find.text('취소'));
     await tester.pumpAndSettle();
     await save(tester);
 
@@ -234,7 +234,7 @@ void main() {
 
   testWidgets('다 읽은 날이 이미 있으면 묻지 않고 다 읽음으로 바꾼다', (tester) async {
     await openReading(tester, finishedAt: '2026-09-01');
-    await tester.tap(find.text('읽음'));
+    await tester.tap(find.text('다 읽음'));
     await tester.pumpAndSettle();
     expect(find.text('언제 다 읽었어요?'), findsNothing);
     await save(tester);

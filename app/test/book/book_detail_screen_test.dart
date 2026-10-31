@@ -172,7 +172,7 @@ void main() {
       isEmpty,
     );
 
-    await tester.tap(find.text('읽음'));
+    await tester.tap(find.text('다 읽음'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('기억 안 나요'));
     await tester.pumpAndSettle();
@@ -188,7 +188,7 @@ void main() {
       };
     await openBook(tester, api);
 
-    expect(find.text('내 기록 · 읽음 ★★★★'), findsOneWidget);
+    expect(find.text('내 기록 · 다 읽음 ★★★★'), findsOneWidget);
     expect(find.text('내 서재에 담기'), findsNothing);
     await tester.tap(find.text('고치기'));
     await tester.pumpAndSettle();
@@ -264,7 +264,7 @@ void main() {
 
     Future<void> tapDone(WidgetTester tester) async {
       await openBook(tester, api);
-      await tester.tap(find.text('읽음'));
+      await tester.tap(find.text('다 읽음'));
       await tester.pumpAndSettle();
     }
 
@@ -297,7 +297,7 @@ void main() {
       await tapDone(tester);
       await choose(tester, '날짜 고르기');
       await tester.tap(find.text('1'));
-      await tester.tap(find.text('OK'));
+      await tester.tap(find.text('확인'));
       await tester.pumpAndSettle();
 
       expect(api.calls, contains('createRecord:$isbn:DONE'));
@@ -334,9 +334,9 @@ void main() {
       expect(find.text('기록은 담았어요. 다 읽은 날은 기록 고치기에서 넣어 주세요.'), findsOneWidget);
     });
 
-    testWidgets('읽고 싶다는 묻지 않고 바로 담는다', (tester) async {
+    testWidgets('읽고 싶음은 묻지 않고 바로 담는다', (tester) async {
       await openBook(tester, api);
-      await tester.tap(find.text('읽고 싶다'));
+      await tester.tap(find.text('읽고 싶음'));
       await tester.pumpAndSettle();
 
       expect(find.text('언제 다 읽었어요?'), findsNothing);
