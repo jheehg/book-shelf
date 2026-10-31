@@ -7,8 +7,15 @@ import '../../api/models.dart';
 import '../../api/providers.dart';
 import '../../shelf/finish_date_sheet.dart';
 import '../../shelf/records_provider.dart';
+import '../../theme/app_theme.dart';
+import '../../theme/reading_status_style.dart';
 import '../book_providers.dart';
 
+const recordBarBottom = 34.0;
+const recordBarHeight = 56.0;
+
+/// 화면 아래에 떠 있는 기록 버튼. 담은 책은 기록 고치기로, 아직 담지 않은 책은
+/// 상태를 고르는 시트로 이어진다.
 class RecordBar extends ConsumerWidget {
   const RecordBar({super.key, required this.isbn});
 
@@ -16,42 +23,28 @@ class RecordBar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final mine = switch (ref.watch(recordsProvider)) {
-      AsyncData(:final value) =>
-        value.where((record) => record.isbn13 == isbn).firstOrNull,
-      _ => null,
-    };
+    final mine = ref.watch(myRecordProvider(isbn));
     if (mine != null) {
-      final stars = mine.rating == null ? '' : ' ${'★' * mine.rating!}';
-      return Row(
-        children: [
-          Expanded(child: Text('내 기록 · ${mine.status.label}$stars')),
-          TextButton(
-            onPressed: () => context.push('/record/${mine.id}'),
-            child: const Text('고치기'),
-          ),
-        ],
+      return _Pill(
+        onPressed: () => context.push('/record/${mine.id}'),
+        label: '기록 고치기',
       );
     }
-    return Padding(
-      padding: const EdgeInsets.only(top: 12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('내 서재에 담기', style: Theme.of(context).textTheme.titleSmall),
-          const SizedBox(height: 8),
-          Wrap(
-            spacing: 8,
-            children: [
-              for (final status in ReadingStatus.values)
-                FilledButton.tonal(
-                  onPressed: () => _create(context, ref, status),
-                  child: Text(status.label),
-                ),
-            ],
-          ),
-        ],
-      ),
+    final knownBook = switch (ref.watch(bookDetailProvider(isbn))) {
+      AsyncData(:final value) => value != null,
+      _ => false,
+    };
+    return _Pill(
+      onPressed: () async {
+        final status = await _askStatus(context);
+        if (status != null && context.mounted) {
+          await _create(context, ref, status);
+        }
+      },
+      icon: Icons.add,
+      label: '내 서재에 담기',
+      // 잉크색 책 덩어리 위에서는 잉크 버튼이 묻히므로 토마토로 띄운다.
+      background: knownBook ? AppColors.tomato : AppColors.ink,
     );
   }
 
@@ -114,5 +107,77 @@ class RecordBar extends ConsumerWidget {
     } on ApiException {
       return false;
     }
+  }
+}
+
+Future<ReadingStatus?> _askStatus(BuildContext context) =>
+    showModalBottomSheet<ReadingStatus>(
+      context: context,
+      builder: (sheetContext) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              title: Text(
+                '내 서재에 담기',
+                style: Theme.of(sheetContext).textTheme.titleMedium,
+              ),
+            ),
+            for (final status in ReadingStatus.values)
+              ListTile(
+                leading: CircleAvatar(
+                  backgroundColor: status.color,
+                  foregroundColor: AppColors.ink,
+                  child: Transform.rotate(
+                    angle: status.arrowAngle,
+                    child: const Icon(Icons.arrow_forward, size: 22),
+                  ),
+                ),
+                title: Text(
+                  status.label,
+                  style: const TextStyle(fontWeight: FontWeight.w700),
+                ),
+                onTap: () => Navigator.pop(sheetContext, status),
+              ),
+          ],
+        ),
+      ),
+    );
+
+class _Pill extends StatelessWidget {
+  const _Pill({
+    required this.onPressed,
+    required this.label,
+    this.icon,
+    this.background = AppColors.ink,
+  });
+
+  final VoidCallback onPressed;
+  final String label;
+  final IconData? icon;
+  final Color background;
+
+  @override
+  Widget build(BuildContext context) {
+    final foreground = background == AppColors.ink
+        ? AppColors.surface
+        : AppColors.ink;
+    final style = FilledButton.styleFrom(
+      backgroundColor: background,
+      foregroundColor: foreground,
+      minimumSize: const Size(0, recordBarHeight),
+      padding: const EdgeInsets.symmetric(horizontal: 30),
+      elevation: 8,
+      shadowColor: const Color(0x66000000),
+    );
+    final icon = this.icon;
+    return icon == null
+        ? FilledButton(style: style, onPressed: onPressed, child: Text(label))
+        : FilledButton.icon(
+            style: style,
+            onPressed: onPressed,
+            icon: Icon(icon, size: 20),
+            label: Text(label),
+          );
   }
 }

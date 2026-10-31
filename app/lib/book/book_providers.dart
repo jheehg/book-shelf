@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../api/api_error.dart';
 import '../api/models.dart';
 import '../api/providers.dart';
+import '../shelf/records_provider.dart';
 
 final nowProvider = Provider<DateTime Function()>((ref) => DateTime.now);
 
@@ -40,3 +41,11 @@ final ebookProvider = FutureProvider.autoDispose.family<Ebook?, String>((
   if (detail == null) return null;
   return api.ebook(isbn);
 });
+
+final myRecordProvider = Provider.autoDispose.family<RecordItem?, String>(
+  (ref, isbn) => switch (ref.watch(recordsProvider)) {
+    AsyncData(:final value) =>
+      value.where((record) => record.isbn13 == isbn).firstOrNull,
+    _ => null,
+  },
+);

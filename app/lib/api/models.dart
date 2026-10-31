@@ -245,7 +245,7 @@ class StoreLinks {
 enum HoldingState {
   available('AVAILABLE', '대출 가능'),
   onLoan('ON_LOAN', '대출 중'),
-  notHeld('NOT_HELD', '소장하지 않음'),
+  notHeld('NOT_HELD', '소장 안 함'),
   unknown('UNKNOWN', '확인 불가');
 
   const HoldingState(this.wire, this.label);

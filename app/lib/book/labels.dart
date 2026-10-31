@@ -12,6 +12,11 @@ String saleStatusLabel(Sale sale) {
 
 /// 가격이 없거나 양수가 아니면 숫자를 표시하지 않는다.
 String? priceLabel(int? won) {
+  final digits = priceDigits(won);
+  return digits == null ? null : '$digits원';
+}
+
+String? priceDigits(int? won) {
   if (won == null || won <= 0) return null;
   final digits = won.toString();
   final out = StringBuffer();
@@ -19,7 +24,7 @@ String? priceLabel(int? won) {
     if (i > 0 && (digits.length - i) % 3 == 0) out.write(',');
     out.write(digits[i]);
   }
-  return '$out원';
+  return out.toString();
 }
 
 /// 상태가 있는 칸의 기준 시각을 정확한 척하지 않고 대략으로 안내한다.

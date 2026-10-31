@@ -7,6 +7,7 @@ import '../settings/settings_providers.dart';
 import '../theme/app_theme.dart';
 import '../theme/reading_status_style.dart';
 import '../widgets/cover.dart';
+import '../widgets/status_tag.dart';
 import 'bookshelf_view.dart';
 import 'records_provider.dart';
 import 'shelf_layout.dart';
@@ -263,18 +264,7 @@ class _RecordCard extends StatelessWidget {
                         ),
                       ),
                       const Spacer(),
-                      Text(
-                        status.label,
-                        style: const TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      const SizedBox(width: 6),
-                      Transform.rotate(
-                        angle: status.arrowAngle,
-                        child: const Icon(Icons.arrow_forward, size: 26),
-                      ),
+                      StatusTag(status),
                     ],
                   ),
                   Row(

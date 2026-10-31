@@ -69,23 +69,39 @@ Future<void> openBook(WidgetTester tester, FakeApi api, {bool settle = true}) =>
 Finder inSection(String title, Finder child) =>
     find.descendant(of: find.byKey(Key('section-$title')), matching: child);
 
+Finder inHero(Finder child) =>
+    find.descendant(of: find.byKey(const Key('book-hero')), matching: child);
+
+Future<void> chooseStatus(WidgetTester tester, String status) async {
+  await tester.tap(find.text('내 서재에 담기'));
+  await tester.pumpAndSettle();
+  await tester.tap(find.text(status));
+  await tester.pumpAndSettle();
+}
+
 void main() {
   testWidgets('읽을 수단을 한 화면에 보여준다', (tester) async {
     final api = happyApi();
     await openBook(tester, api);
 
     expect(find.text('소년이 온다'), findsOneWidget);
-    expect(inSection('새 책', find.text('판매 중')), findsOneWidget);
+    expect(find.text('한강 · 창비'), findsOneWidget);
+    expect(find.text('아직 담지 않은 책'), findsOneWidget);
+    expect(inSection('새 책', find.text('판매 중 · 3시간 전 기준')), findsOneWidget);
     expect(inSection('새 책', find.text('13,500원')), findsOneWidget);
-    expect(inSection('새 책', find.text('3시간 전 기준')), findsOneWidget);
+    expect(inSection('새 책', find.text('15,000원')), findsOneWidget);
     expect(inSection('새 책', find.text('교보문고')), findsOneWidget);
     expect(inSection('중고', find.text('알라딘 중고')), findsOneWidget);
+    expect(inSection('빌리기', find.text('내 도서관')), findsOneWidget);
     expect(inSection('빌리기', find.text('대출 가능')), findsOneWidget);
     expect(inSection('빌리기', find.text('대출 중')), findsOneWidget);
     expect(inSection('빌리기', find.text('전날 기준')), findsOneWidget);
-    expect(inSection('전자책·구독', find.text('10,800원')), findsOneWidget);
-    expect(inSection('전자책·구독', find.text('powered by Google')), findsOneWidget);
-    expect(inSection('전자책·구독', find.text('리디')), findsOneWidget);
+    expect(inSection('전자책', find.text('10,800원')), findsOneWidget);
+    expect(
+      inSection('전자책', find.textContaining('powered by Google')),
+      findsOneWidget,
+    );
+    expect(inSection('전자책', find.text('리디')), findsOneWidget);
   });
 
   testWidgets('도서관 칸 오류는 그 칸에만 표시한다', (tester) async {
@@ -97,10 +113,11 @@ void main() {
       );
     await openBook(tester, api);
 
-    expect(inSection('빌리기', find.text('확인 불가 · 당겨서 다시 시도')), findsOneWidget);
+    expect(inSection('빌리기', find.text('확인 불가')), findsOneWidget);
+    expect(inSection('빌리기', find.text('당겨서 다시 시도')), findsOneWidget);
     expect(find.text('소년이 온다'), findsOneWidget);
-    expect(inSection('새 책', find.text('판매 중')), findsOneWidget);
-    expect(inSection('전자책·구독', find.text('10,800원')), findsOneWidget);
+    expect(inSection('새 책', find.text('판매 중 · 3시간 전 기준')), findsOneWidget);
+    expect(inSection('전자책', find.text('10,800원')), findsOneWidget);
   });
 
   testWidgets('전자책이 느려도 다른 칸과 구매 링크를 먼저 표시한다', (tester) async {
@@ -115,15 +132,15 @@ void main() {
     expect(inSection('새 책', find.text('교보문고')), findsOneWidget);
     expect(inSection('빌리기', find.text('대출 가능')), findsOneWidget);
     expect(
-      inSection('전자책·구독', find.byType(CircularProgressIndicator)),
+      inSection('전자책', find.byType(CircularProgressIndicator)),
       findsOneWidget,
     );
-    expect(inSection('전자책·구독', find.text('리디')), findsOneWidget);
+    expect(inSection('전자책', find.text('리디')), findsOneWidget);
 
     slow.complete(const Ebook(status: 'NO_MATCH'));
     await tester.pumpAndSettle();
     expect(
-      inSection('전자책·구독', find.byType(CircularProgressIndicator)),
+      inSection('전자책', find.byType(CircularProgressIndicator)),
       findsNothing,
     );
   });
@@ -133,9 +150,12 @@ void main() {
       ..onEbook = (i) async => const Ebook(status: 'NO_MATCH');
     await openBook(tester, api);
 
-    expect(inSection('전자책·구독', find.textContaining('원')), findsNothing);
-    expect(inSection('전자책·구독', find.text('powered by Google')), findsNothing);
-    expect(inSection('전자책·구독', find.text('리디')), findsOneWidget);
+    expect(inSection('전자책', find.textContaining('원')), findsNothing);
+    expect(
+      inSection('전자책', find.textContaining('powered by Google')),
+      findsNothing,
+    );
+    expect(inSection('전자책', find.text('리디')), findsOneWidget);
   });
 
   testWidgets('판매 확인 전에는 가격과 기준 시각을 표시하지 않는다', (tester) async {
@@ -147,6 +167,7 @@ void main() {
     await openBook(tester, api);
 
     expect(inSection('새 책', find.text('가격 확인 불가')), findsOneWidget);
+    expect(inSection('새 책', find.text('당겨서 다시 시도')), findsOneWidget);
     expect(inSection('새 책', find.textContaining('원')), findsNothing);
     expect(inSection('새 책', find.textContaining('기준')), findsNothing);
     expect(inSection('새 책', find.text('교보문고')), findsOneWidget);
@@ -161,10 +182,12 @@ void main() {
       );
     await openBook(tester, api);
 
-    expect(find.textContaining('책 정보를 찾지 못했어요'), findsOneWidget);
+    expect(find.text('책 정보를\n찾지 못했어요'), findsOneWidget);
+    expect(find.text('ISBN $isbn'), findsOneWidget);
+    expect(find.text('그래도 기록해 두면 책 정보는 나중에 채워져요.'), findsOneWidget);
     expect(find.text('책 정보가 없어 서점 링크를 만들 수 없어요'), findsOneWidget);
     expect(find.byKey(const Key('section-중고')), findsNothing);
-    expect(find.byKey(const Key('section-전자책·구독')), findsNothing);
+    expect(find.byKey(const Key('section-전자책')), findsNothing);
     expect(
       api.calls.where(
         (call) => call.startsWith('links:') || call.startsWith('ebook:'),
@@ -172,8 +195,7 @@ void main() {
       isEmpty,
     );
 
-    await tester.tap(find.text('다 읽음'));
-    await tester.pumpAndSettle();
+    await chooseStatus(tester, '다 읽음');
     await tester.tap(find.text('기억 안 나요'));
     await tester.pumpAndSettle();
     expect(api.calls, contains('createRecord:$isbn:DONE'));
@@ -183,16 +205,26 @@ void main() {
     final api = happyApi()
       ..recordsBySlug = {
         'mine': [
-          record(1, isbn, ReadingStatus.done, title: '소년이 온다', rating: 4),
+          record(
+            1,
+            isbn,
+            ReadingStatus.done,
+            title: '소년이 온다',
+            rating: 4,
+            review: '오래 남는 책',
+          ),
         ],
       };
     await openBook(tester, api);
 
-    expect(find.text('내 기록 · 다 읽음 ★★★★'), findsOneWidget);
+    expect(inHero(find.text('다 읽음')), findsOneWidget);
+    expect(inHero(find.text('4')), findsOneWidget);
+    expect(inHero(find.text('“오래 남는 책”')), findsOneWidget);
+    expect(find.text('아직 담지 않은 책'), findsNothing);
     expect(find.text('내 서재에 담기'), findsNothing);
-    await tester.tap(find.text('고치기'));
+    await tester.tap(find.text('기록 고치기'));
     await tester.pumpAndSettle();
-    expect(find.text('기록 고치기'), findsOneWidget);
+    expect(find.text('저장'), findsOneWidget);
   });
 
   testWidgets('제목 없는 앱바에 기록 버튼은 내 서재에 담는다고 알린다', (tester) async {
@@ -208,8 +240,10 @@ void main() {
   testWidgets('서점 링크는 서점 이름과 바깥으로 나가는 표시만 보여준다', (tester) async {
     await openBook(tester, happyApi());
 
-    expect(inSection('새 책', find.text('교보문고')), findsOneWidget);
-    expect(inSection('새 책', find.byIcon(Icons.open_in_new)), findsOneWidget);
+    expect(
+      inSection('새 책', find.widgetWithText(OutlinedButton, '교보문고')),
+      findsOneWidget,
+    );
     expect(find.textContaining('에서 찾기'), findsNothing);
   });
 
@@ -221,10 +255,7 @@ void main() {
     );
     final api = happyApi()..onEbook = (i) => throw tryLater;
     await openBook(tester, api);
-    expect(
-      inSection('전자책·구독', find.text('가격 확인 불가 · 당겨서 다시 시도')),
-      findsOneWidget,
-    );
+    expect(inSection('전자책', find.text('확인 불가')), findsOneWidget);
 
     api.onBook = (i) => throw tryLater;
     await tester.fling(
@@ -233,14 +264,78 @@ void main() {
       1000,
     );
     await tester.pumpAndSettle();
-    expect(inSection('새 책', find.text('확인 불가 · 당겨서 다시 시도')), findsOneWidget);
+    expect(inSection('새 책', find.text('확인 불가')), findsOneWidget);
+    expect(inSection('새 책', find.text('당겨서 다시 시도')), findsOneWidget);
   });
 
   testWidgets('등록한 도서관이 없으면 등록을 안내한다', (tester) async {
     final api = happyApi()..onHoldings = (i) async => const <Holding>[];
     await openBook(tester, api);
 
-    expect(inSection('빌리기', find.textContaining('도서관을 등록하면')), findsOneWidget);
+    expect(
+      inSection('빌리기', find.text('내 도서관을 등록하면 대출할 수 있는지 바로 보여요.')),
+      findsOneWidget,
+    );
+    await tester.ensureVisible(inSection('빌리기', find.text('도서관 등록')));
+    await tester.pumpAndSettle();
+    await tester.tap(inSection('빌리기', find.text('도서관 등록')));
+    await tester.pumpAndSettle();
+    expect(
+      find.descendant(of: find.byType(AppBar), matching: find.text('내 도서관')),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('이미 담긴 책이면 오류 없이 내 기록으로 바뀐다', (tester) async {
+    final api = happyApi();
+    api.onCreateRecord = (i, status) async {
+      api.recordsBySlug = {
+        'mine': [record(7, isbn, ReadingStatus.reading, title: '소년이 온다')],
+      };
+      throw const ApiException(
+        statusCode: 409,
+        code: 'CONFLICT',
+        message: '이미 담은 책이에요',
+      );
+    };
+    await openBook(tester, api);
+    await chooseStatus(tester, '읽고 싶음');
+
+    expect(find.text('이미 담은 책이에요'), findsNothing);
+    expect(inHero(find.text('읽는 중')), findsOneWidget);
+    expect(find.text('기록 고치기'), findsOneWidget);
+  });
+
+  testWidgets('담지 못하면 이유를 알리고 담기 버튼을 그대로 둔다', (tester) async {
+    final api = happyApi()
+      ..onCreateRecord = (i, status) => throw const ApiException(
+        statusCode: 503,
+        code: 'TRY_LATER',
+        message: '잠시 후 다시 시도해 주세요',
+      );
+    await openBook(tester, api);
+    await chooseStatus(tester, '읽는 중');
+
+    expect(api.calls, contains('createRecord:$isbn:READING'));
+    expect(find.text('잠시 후 다시 시도해 주세요'), findsOneWidget);
+    expect(find.text('내 서재에 담기'), findsOneWidget);
+  });
+
+  testWidgets('담으면 책 덩어리가 고른 상태로 바뀐다', (tester) async {
+    final api = happyApi();
+    api.onCreateRecord = (i, status) async {
+      final created = record(99, isbn, status, title: '소년이 온다');
+      api.recordsBySlug = {
+        'mine': [created],
+      };
+      return created;
+    };
+    await openBook(tester, api);
+    await chooseStatus(tester, '읽는 중');
+
+    expect(find.text('아직 담지 않은 책'), findsNothing);
+    expect(inHero(find.text('읽는 중')), findsOneWidget);
+    expect(find.text('기록 고치기'), findsOneWidget);
   });
 
   group('읽음으로 담기', () {
@@ -264,8 +359,7 @@ void main() {
 
     Future<void> tapDone(WidgetTester tester) async {
       await openBook(tester, api);
-      await tester.tap(find.text('다 읽음'));
-      await tester.pumpAndSettle();
+      await chooseStatus(tester, '다 읽음');
     }
 
     Future<void> choose(WidgetTester tester, String choice) async {
@@ -336,8 +430,7 @@ void main() {
 
     testWidgets('읽고 싶음은 묻지 않고 바로 담는다', (tester) async {
       await openBook(tester, api);
-      await tester.tap(find.text('읽고 싶음'));
-      await tester.pumpAndSettle();
+      await chooseStatus(tester, '읽고 싶음');
 
       expect(find.text('언제 다 읽었어요?'), findsNothing);
       expect(api.calls, contains('createRecord:$isbn:WANT'));
