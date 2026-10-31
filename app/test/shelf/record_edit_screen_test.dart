@@ -7,6 +7,17 @@ import 'package:flutter_test/flutter_test.dart';
 import '../support/fake_api.dart';
 import '../support/harness.dart';
 
+/// 화면이 테스트 창보다 길어 아래 카드는 스크롤해야 만들어진다.
+Future<void> reveal(WidgetTester tester, Finder finder) async {
+  await tester.scrollUntilVisible(
+    finder,
+    200,
+    scrollable: find.byType(Scrollable).first,
+  );
+  await tester.ensureVisible(finder);
+  await tester.pumpAndSettle();
+}
+
 void main() {
   late FakeApi api;
   RecordUpdate? sent;
@@ -42,8 +53,9 @@ void main() {
 
     await tester.tap(find.byKey(const Key('star-4')));
     await tester.enterText(find.byKey(const Key('review')), '  다시 읽고 싶다 ');
-    await tester.tap(find.text('별점만'));
     await tester.tap(find.text('읽는 중'));
+    await reveal(tester, find.text('별점만'));
+    await tester.tap(find.text('별점만'));
     await tester.tap(find.text('저장'));
     await tester.pumpAndSettle();
 
@@ -67,10 +79,11 @@ void main() {
     await tester.enterText(find.byKey(const Key('review')), '👨‍👩‍👧' * 41);
     await tester.pumpAndSettle();
 
-    expect(find.text('205/200'), findsOneWidget);
+    expect(find.text('205 / 200'), findsOneWidget);
+    expect(find.text('한줄평은 200자까지예요'), findsOneWidget);
     expect(
       tester
-          .widget<TextButton>(find.widgetWithText(TextButton, '저장'))
+          .widget<FilledButton>(find.widgetWithText(FilledButton, '저장'))
           .onPressed,
       isNull,
     );
@@ -111,10 +124,11 @@ void main() {
     ];
     await pumpApp(tester, api, initialLocation: '/record/1');
 
+    await reveal(tester, find.text('다 읽은 날이 시작한 날보다 앞이에요'));
     expect(find.text('다 읽은 날이 시작한 날보다 앞이에요'), findsOneWidget);
     expect(
       tester
-          .widget<TextButton>(find.widgetWithText(TextButton, '저장'))
+          .widget<FilledButton>(find.widgetWithText(FilledButton, '저장'))
           .onPressed,
       isNull,
     );
@@ -122,6 +136,7 @@ void main() {
 
   testWidgets('날짜가 없으면 날짜 지우기를 보여주지 않는다', (tester) async {
     await pumpApp(tester, api, initialLocation: '/record/1');
+    await reveal(tester, find.text('다 읽은 날'));
     expect(find.text('날짜 지우기'), findsNothing);
   });
 
@@ -137,11 +152,14 @@ void main() {
       ),
     ];
     await pumpApp(tester, api, initialLocation: '/record/1');
-    await tester.tap(find.widgetWithText(TextButton, '날짜 지우기'));
+    await reveal(tester, find.text('2026. 9. 20'));
+    expect(find.text('2026. 9. 1'), findsOneWidget);
+    expect(find.text('2026. 9. 20'), findsOneWidget);
+    await tester.tap(find.widgetWithText(OutlinedButton, '날짜 지우기'));
     await tester.pumpAndSettle();
 
-    expect(find.text('시작한 날'), findsOneWidget);
-    expect(find.text('다 읽은 날'), findsOneWidget);
+    expect(find.text('2026. 9. 1'), findsNothing);
+    expect(find.text('날짜 없음'), findsNWidgets(2));
     expect(find.text('날짜 지우기'), findsNothing);
   });
 
@@ -265,6 +283,6 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('연결을 확인해 주세요'), findsOneWidget);
-    expect(find.text('기록 고치기'), findsOneWidget);
+    expect(find.textContaining('기록 고치기'), findsOneWidget);
   });
 }

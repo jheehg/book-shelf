@@ -189,7 +189,7 @@ void main() {
 
     await tester.tap(find.bySemanticsLabel('소년이 온다'));
     await tester.pumpAndSettle();
-    expect(find.text('기록 고치기'), findsOneWidget);
+    expect(find.textContaining('기록 고치기'), findsOneWidget);
     semantics.dispose();
   });
 
@@ -350,8 +350,8 @@ void main() {
     await tester.tap(find.text('소년이 온다'));
     await tester.pumpAndSettle();
 
-    expect(find.text('기록 고치기'), findsOneWidget);
-    expect(find.text('공개 범위'), findsOneWidget);
+    expect(find.textContaining('기록 고치기'), findsOneWidget);
+    expect(find.text('별점'), findsOneWidget);
   });
 
   testWidgets('로그아웃 후 다른 계정에는 앞사람의 기록이 남지 않는다', (tester) async {
