@@ -17,6 +17,7 @@ class SearchState {
   const SearchState({
     this.query = '',
     this.items = const [],
+    this.total = 0,
     this.isEnd = true,
     this.loading = false,
     this.error,
@@ -25,6 +26,7 @@ class SearchState {
 
   final String query;
   final List<SearchItem> items;
+  final int total;
   final bool isEnd;
   final bool loading;
   final String? error;
@@ -33,6 +35,7 @@ class SearchState {
   SearchState copyWith({bool? loading, String? error}) => SearchState(
     query: query,
     items: items,
+    total: total,
     isEnd: isEnd,
     loading: loading ?? this.loading,
     error: error,
@@ -80,6 +83,7 @@ class SearchNotifier extends Notifier<SearchState> {
       state = SearchState(
         query: query,
         items: [...before, ...result.items],
+        total: result.total,
         isEnd: result.isEnd || page >= maxSearchPage,
         page: page,
       );
@@ -88,6 +92,7 @@ class SearchNotifier extends Notifier<SearchState> {
       state = SearchState(
         query: query,
         items: before,
+        total: state.total,
         isEnd: true,
         error: error.message,
         page: page - 1,

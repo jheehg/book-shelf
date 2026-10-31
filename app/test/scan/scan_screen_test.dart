@@ -24,14 +24,14 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  TextButton openButton(WidgetTester tester) =>
-      tester.widget<TextButton>(find.widgetWithText(TextButton, '열기'));
+  FilledButton openButton(WidgetTester tester) =>
+      tester.widget<FilledButton>(find.widgetWithText(FilledButton, '열기'));
 
   testWidgets('카메라 화면이 뜨기 전에는 조준 틀 없이 직접 입력만 보인다', (tester) async {
     await pumpApp(tester, api);
     await tester.tap(find.text('바코드로 담기'));
     await tester.pumpAndSettle();
-    expect(find.text('책 뒷면 바코드를 틀 안에 맞춰 주세요'), findsNothing);
+    expect(find.text('978이나 979로 시작하는 바코드를 틀 안에 맞춰 주세요'), findsNothing);
     expect(find.text('ISBN 직접 입력'), findsOneWidget);
   });
 
@@ -42,10 +42,12 @@ void main() {
     await tester.enterText(find.byType(TextField), '9788936434121');
     await tester.pump();
     expect(openButton(tester).onPressed, isNull);
+    expect(find.text('13자리 · 책 ISBN이 맞아요'), findsNothing);
 
     await tester.enterText(find.byType(TextField), ' 978-89-364-3412-0 ');
     await tester.pump();
     expect(openButton(tester).onPressed, isNotNull);
+    expect(find.text('13자리 · 책 ISBN이 맞아요'), findsOneWidget);
 
     await tester.tap(find.text('열기'));
     await tester.pumpAndSettle();
@@ -71,7 +73,7 @@ void main() {
     await tester.tap(find.text('취소'));
     await tester.pumpAndSettle();
 
-    expect(find.text('바코드 찍기'), findsOneWidget);
-    expect(find.byType(AlertDialog), findsNothing);
+    expect(find.textContaining('바코드 찍기', findRichText: true), findsOneWidget);
+    expect(find.byType(BottomSheet), findsNothing);
   });
 }

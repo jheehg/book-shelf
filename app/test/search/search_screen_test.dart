@@ -76,7 +76,10 @@ void main() {
     await type(tester, '책들', const Duration(milliseconds: 400));
     await tester.pumpAndSettle();
     expect(find.text('책 1'), findsOneWidget);
-    expect(find.textContaining('판매 중'), findsWidgets);
+    expect(find.text('책들'), findsNWidgets(2));
+    expect(find.text('15권'), findsOneWidget);
+    expect(find.text('판매 중'), findsWidgets);
+    expect(find.text('13,500원'), findsWidgets);
 
     await tester.drag(find.byType(ListView), const Offset(0, -3000));
     await tester.pumpAndSettle();
