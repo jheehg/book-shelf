@@ -48,21 +48,79 @@ class _ScanScreenState extends State<ScanScreen> {
       builder: (_) => const _TypedIsbnDialog(),
     );
     if (isbn == null || !mounted) return;
-    if (isBookIsbn13(isbn)) {
-      context.pushReplacement('/book/$isbn');
-    } else {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('13자리 ISBN이 아니에요')));
-    }
+    context.pushReplacement('/book/$isbn');
   }
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(
-      title: const Text('바코드 찍기'),
-      actions: [TextButton(onPressed: _typeIsbn, child: const Text('직접 입력'))],
+    appBar: AppBar(title: const Text('바코드 찍기')),
+    body: Stack(
+      fit: StackFit.expand,
+      children: [
+        MobileScanner(
+          controller: _controller,
+          onDetect: _onDetect,
+          overlayBuilder: (context, constraints) => Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 280,
+                  height: 150,
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.white, width: 2),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                const _OnCamera('책 뒷면 바코드를 틀 안에 맞춰 주세요'),
+              ],
+            ),
+          ),
+          errorBuilder: (context, error) => ColoredBox(
+            color: Colors.black,
+            child: Center(
+              child: _OnCamera(
+                error.errorCode == MobileScannerErrorCode.permissionDenied
+                    ? '카메라 권한이 없어요. 설정에서 허용하거나 ISBN을 직접 입력해 주세요.'
+                    : '카메라를 쓸 수 없어요. ISBN을 직접 입력해 주세요.',
+              ),
+            ),
+          ),
+        ),
+        Align(
+          alignment: Alignment.bottomCenter,
+          child: SafeArea(
+            minimum: const EdgeInsets.only(bottom: 32),
+            child: FilledButton.tonal(
+              onPressed: _typeIsbn,
+              child: const Text('ISBN 직접 입력'),
+            ),
+          ),
+        ),
+      ],
     ),
-    body: MobileScanner(controller: _controller, onDetect: _onDetect),
+  );
+}
+
+class _OnCamera extends StatelessWidget {
+  const _OnCamera(this.text);
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    margin: const EdgeInsets.symmetric(horizontal: 24),
+    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+    decoration: BoxDecoration(
+      color: Colors.black54,
+      borderRadius: BorderRadius.circular(20),
+    ),
+    child: Text(
+      text,
+      textAlign: TextAlign.center,
+      style: const TextStyle(color: Colors.white),
+    ),
   );
 }
 
@@ -78,6 +136,8 @@ class _TypedIsbnDialog extends StatefulWidget {
 class _TypedIsbnDialogState extends State<_TypedIsbnDialog> {
   final _text = TextEditingController();
 
+  String get _isbn => _text.text.replaceAll('-', '').trim();
+
   @override
   void dispose() {
     _text.dispose();
@@ -90,6 +150,7 @@ class _TypedIsbnDialogState extends State<_TypedIsbnDialog> {
     content: TextField(
       controller: _text,
       keyboardType: TextInputType.number,
+      onChanged: (_) => setState(() {}),
       decoration: const InputDecoration(hintText: '13자리'),
     ),
     actions: [
@@ -98,8 +159,9 @@ class _TypedIsbnDialogState extends State<_TypedIsbnDialog> {
         child: const Text('취소'),
       ),
       TextButton(
-        onPressed: () =>
-            Navigator.pop(context, _text.text.replaceAll('-', '').trim()),
+        onPressed: isBookIsbn13(_isbn)
+            ? () => Navigator.pop(context, _isbn)
+            : null,
         child: const Text('열기'),
       ),
     ],

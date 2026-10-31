@@ -120,6 +120,39 @@ void main() {
     expect(find.textContaining('오늘은 검색을 너무 많이 했어요'), findsOneWidget);
   });
 
+  testWidgets('지우기 버튼은 입력이 있을 때만 보이고 검색어와 결과를 비운다', (tester) async {
+    api.onSearch = (query, page) async =>
+        SearchPage(items: [item(1)], total: 1, isEnd: true);
+    await pumpApp(tester, api, initialLocation: '/search');
+    expect(find.byIcon(Icons.search), findsOneWidget);
+    expect(find.byTooltip('지우기'), findsNothing);
+
+    await type(tester, '책들', const Duration(milliseconds: 400));
+    await tester.pumpAndSettle();
+    expect(find.text('책 1'), findsOneWidget);
+
+    await tester.tap(find.byTooltip('지우기'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('책 1'), findsNothing);
+    expect(
+      tester.widget<TextField>(find.byType(TextField)).controller!.text,
+      isEmpty,
+    );
+    expect(find.byTooltip('지우기'), findsNothing);
+  });
+
+  testWidgets('입력 직후 지우면 이전 검색어로 검색하지 않는다', (tester) async {
+    await pumpApp(tester, api, initialLocation: '/search');
+
+    await type(tester, '책들', const Duration(milliseconds: 100));
+    await tester.tap(find.byTooltip('지우기'));
+    await tester.pump(const Duration(milliseconds: 500));
+    await tester.pumpAndSettle();
+
+    expect(searches(), isEmpty);
+  });
+
   testWidgets('검색 결과를 누르면 책 상세로 이동한다', (tester) async {
     api.onSearch = (query, page) async =>
         SearchPage(items: [item(1)], total: 1, isEnd: true);

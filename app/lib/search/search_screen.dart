@@ -16,6 +16,7 @@ class SearchScreen extends ConsumerStatefulWidget {
 
 class _SearchScreenState extends ConsumerState<SearchScreen> {
   final _debouncer = Debouncer();
+  final _query = TextEditingController();
   final _scroll = ScrollController();
 
   @override
@@ -34,10 +35,17 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   @override
   void dispose() {
     _debouncer.dispose();
+    _query.dispose();
     _scroll
       ..removeListener(_loadWhenNearEnd)
       ..dispose();
     super.dispose();
+  }
+
+  void _clear() {
+    _debouncer.cancel();
+    _query.clear();
+    ref.read(searchProvider.notifier).search('');
   }
 
   @override
@@ -45,14 +53,33 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     final state = ref.watch(searchProvider);
     return Scaffold(
       appBar: AppBar(
-        title: TextField(
-          autofocus: true,
-          decoration: const InputDecoration(
-            hintText: '제목이나 저자',
-            border: InputBorder.none,
+        title: ListenableBuilder(
+          listenable: _query,
+          builder: (context, _) => TextField(
+            controller: _query,
+            autofocus: true,
+            decoration: InputDecoration(
+              hintText: '제목이나 저자',
+              prefixIcon: const Icon(Icons.search),
+              suffixIcon: _query.text.isEmpty
+                  ? null
+                  : IconButton(
+                      tooltip: '지우기',
+                      icon: const Icon(Icons.close),
+                      onPressed: _clear,
+                    ),
+              filled: true,
+              fillColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+              isDense: true,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(28),
+                borderSide: BorderSide.none,
+              ),
+            ),
+            onChanged: (value) => _debouncer(
+              () => ref.read(searchProvider.notifier).search(value),
+            ),
           ),
-          onChanged: (value) =>
-              _debouncer(() => ref.read(searchProvider.notifier).search(value)),
         ),
       ),
       body: Column(
