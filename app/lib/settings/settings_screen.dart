@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../api/api_error.dart';
@@ -11,6 +12,9 @@ import '../api/providers.dart';
 import '../auth/auth_controller.dart';
 import '../library/library_providers.dart';
 import '../shelf/records_provider.dart';
+import '../theme/app_theme.dart';
+import '../widgets/page_heading.dart';
+import '../widgets/visibility_picker.dart';
 import 'settings_providers.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
@@ -162,7 +166,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final meValue = me.value;
     final shelfValue = shelf.value;
     return Scaffold(
-      appBar: AppBar(title: const Text('설정')),
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        leading: backButton(context),
+      ),
       body: meValue != null && shelfValue != null
           ? _settings(meValue, shelfValue)
           : me.hasError || shelf.hasError
@@ -185,125 +192,365 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     );
   }
 
-  Widget _settings(Me me, Shelf shelf) => ListView(
-    children: [
-      const _Header('프로필'),
-      ListTile(
-        title: const Text('이름'),
-        subtitle: Text(me.displayName),
-        onTap: _busy ? null : () => _editName(me),
-      ),
-      ListTile(
-        title: const Text('서재 주소'),
-        subtitle: Text(me.slug),
-        onTap: _busy ? null : () => _editSlug(me),
-      ),
-      ListTile(
-        title: const Text('서재 링크'),
-        subtitle: Text(shelf.url),
-        trailing: IconButton(
-          tooltip: '주소 복사',
-          icon: const Icon(Icons.copy),
-          onPressed: () => _copyUrl(shelf.url),
-        ),
-      ),
-      const _Header('서재 공개'),
-      SwitchListTile(
-        title: const Text('서재 공개'),
-        subtitle: Text(
-          shelf.shelfPublic ? '주소를 아는 누구나 내 서재를 볼 수 있어요' : '나만 볼 수 있어요',
-        ),
-        value: shelf.shelfPublic,
-        onChanged: _busy ? null : (open) => open ? _publish(shelf) : _close(),
-      ),
-      if (shelf.shelfPublic)
-        ListTile(
-          title: const Text('내 공개 서재 보기'),
-          trailing: const Icon(Icons.open_in_new),
-          onTap: () => launchUrl(
-            Uri.parse(shelf.url),
-            mode: LaunchMode.externalApplication,
-          ),
-        ),
-      const _Header('새 기록의 공개 범위'),
-      Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _settings(Me me, Shelf shelf) {
+    final libraries = ref.watch(myLibrariesProvider);
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(8, 0, 8, 40),
+      children: [
+        PageHeading(title: '설정', subtitle: '@${me.slug}'),
+        _Section(
+          color: AppColors.lavender,
+          spacing: 18,
           children: [
-            SegmentedButton<RecordVisibility>(
-              segments: [
-                for (final visibility in RecordVisibility.values)
-                  ButtonSegment(
-                    value: visibility,
-                    label: Text(visibility.label),
+            Row(
+              spacing: 14,
+              children: [
+                ExcludeSemantics(
+                  child: Container(
+                    width: 56,
+                    height: 56,
+                    alignment: Alignment.center,
+                    decoration: const BoxDecoration(
+                      color: AppColors.ink,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Text(
+                      me.displayName.characters.firstOrNull ?? '',
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.surface,
+                      ),
+                    ),
                   ),
+                ),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    spacing: 2,
+                    children: [
+                      Text(
+                        me.displayName,
+                        style: const TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: -0.44,
+                        ),
+                      ),
+                      Text(
+                        shelf.url.replaceFirst(RegExp('^https?://'), ''),
+                        style: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ],
-              selected: {me.defaultVisibility},
-              onSelectionChanged: _busy
-                  ? null
-                  : (selected) => _setDefaultVisibility(selected.first),
             ),
-            Padding(
-              padding: const EdgeInsets.only(top: 4),
-              child: Text(me.defaultVisibility.description),
+            Material(
+              color: const Color(0x99FFFFFF),
+              borderRadius: BorderRadius.circular(18),
+              clipBehavior: Clip.antiAlias,
+              child: Column(
+                children: [
+                  _ProfileRow(
+                    label: '이름',
+                    value: me.displayName,
+                    onTap: _busy ? null : () => _editName(me),
+                  ),
+                  _ProfileRow(
+                    label: '서재 주소',
+                    value: me.slug,
+                    onTap: _busy ? null : () => _editSlug(me),
+                  ),
+                ],
+              ),
+            ),
+            Row(
+              spacing: 8,
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => _copyUrl(shelf.url),
+                    style: OutlinedButton.styleFrom(
+                      minimumSize: const Size.fromHeight(44),
+                    ),
+                    child: const Text('주소 복사'),
+                  ),
+                ),
+                Expanded(
+                  child: FilledButton(
+                    onPressed: () => SharePlus.instance.share(
+                      ShareParams(uri: Uri.parse(shelf.url)),
+                    ),
+                    style: FilledButton.styleFrom(
+                      minimumSize: const Size.fromHeight(44),
+                      textStyle: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    child: const Text('공유'),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
-      ),
-      const _Header('내 도서관'),
-      ListTile(
-        title: const Text('내 도서관'),
-        subtitle: Text(
-          ref
-              .watch(myLibrariesProvider)
-              .when(
-                loading: () => '',
-                error: (_, _) => '불러오지 못했어요',
-                data: _librariesLabel,
+        const SizedBox(height: 8),
+        _Section(
+          children: [
+            MergeSemantics(
+              child: Row(
+                children: [
+                  const Expanded(child: Text('서재 공개', style: _cardTitle)),
+                  Switch(
+                    value: shelf.shelfPublic,
+                    onChanged: _busy
+                        ? null
+                        : (open) => open ? _publish(shelf) : _close(),
+                  ),
+                ],
               ),
+            ),
+            Text(
+              shelf.shelfPublic ? '주소를 아는 누구나 내 서재를 볼 수 있어요' : '나만 볼 수 있어요',
+              style: _note,
+            ),
+            if (shelf.shelfPublic)
+              Align(
+                alignment: Alignment.centerLeft,
+                child: InkWell(
+                  onTap: () => launchUrl(
+                    Uri.parse(shelf.url),
+                    mode: LaunchMode.externalApplication,
+                  ),
+                  child: const SizedBox(
+                    height: 44,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      spacing: 6,
+                      children: [
+                        Text(
+                          '내 공개 서재 보기',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                            decoration: TextDecoration.underline,
+                          ),
+                        ),
+                        Icon(Icons.north_east, size: 16),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+          ],
         ),
-        trailing: const Icon(Icons.chevron_right),
-        onTap: () => context.push('/libraries'),
-      ),
-      const _Header('계정'),
-      ListTile(title: const Text('로그아웃'), onTap: _busy ? null : _logout),
-      ListTile(
-        title: const Text('계정 삭제'),
-        onTap: _busy ? null : _deleteAccount,
-      ),
-      const _Header('앱 정보'),
-      const ListTile(
-        title: Text('데이터 출처'),
-        subtitle: Text('책 정보 카카오 · 도서관 정보나루 · 전자책 Google Books'),
-      ),
-      ListTile(
-        title: const Text('오픈소스 라이선스'),
-        onTap: () => showLicensePage(context: context, applicationName: '책장'),
-      ),
-    ],
-  );
+        const SizedBox(height: 8),
+        _Section(
+          spacing: 12,
+          children: [
+            const Text('새 기록의 공개 범위', style: _cardTitle),
+            VisibilityPicker(
+              selected: me.defaultVisibility,
+              onChanged: _busy ? null : _setDefaultVisibility,
+            ),
+            Text(me.defaultVisibility.description, style: _note),
+          ],
+        ),
+        const SizedBox(height: 8),
+        Material(
+          color: AppColors.tomato,
+          borderRadius: BorderRadius.circular(24),
+          clipBehavior: Clip.antiAlias,
+          child: InkWell(
+            onTap: () => context.push('/libraries'),
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Row(
+                spacing: 8,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      spacing: 4,
+                      children: [
+                        const Text('내 도서관', style: _cardTitle),
+                        Text(
+                          libraries.when(
+                            loading: () => '',
+                            error: (_, _) => '불러오지 못했어요',
+                            data: _librariesLabel,
+                          ),
+                          style: const TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (libraries.value case final list?)
+                    BigNumber(
+                      '${list.length}',
+                      unit: '/$maxLibraries',
+                      size: 40,
+                      unitStyle: const TextStyle(fontSize: 20),
+                    ),
+                  const Icon(Icons.chevron_right),
+                ],
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 8),
+        _Section(
+          padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
+          spacing: 4,
+          children: [
+            const Text('앱 정보', style: _cardTitle),
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 6),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                spacing: 2,
+                children: [
+                  Text('데이터 출처', style: TextStyle(fontSize: 14)),
+                  Text(
+                    '책 정보 카카오 · 도서관 정보나루 · 전자책 Google Books',
+                    style: TextStyle(
+                      fontSize: 12,
+                      height: 1.6,
+                      color: AppColors.bodyMuted,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            InkWell(
+              onTap: () =>
+                  showLicensePage(context: context, applicationName: '책장'),
+              child: const SizedBox(
+                height: 44,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text('오픈소스 라이선스', style: TextStyle(fontSize: 14)),
+                    ),
+                    Icon(Icons.chevron_right, size: 20),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        FilledButton(
+          onPressed: _busy ? null : _logout,
+          child: const Text('로그아웃'),
+        ),
+        TextButton(
+          onPressed: _busy ? null : _deleteAccount,
+          style: TextButton.styleFrom(
+            minimumSize: const Size.fromHeight(48),
+            foregroundColor: _danger,
+            textStyle: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w700,
+              decoration: TextDecoration.underline,
+              decorationColor: _danger,
+            ),
+          ),
+          child: const Text('계정 삭제'),
+        ),
+      ],
+    );
+  }
 }
+
+const _cardTitle = TextStyle(fontSize: 17, fontWeight: FontWeight.w900);
+const _note = TextStyle(fontSize: 13, height: 1.5, color: AppColors.bodyMuted);
+const _danger = Color(0xFFB23D1C);
 
 String _librariesLabel(List<Library> libraries) {
   if (libraries.isEmpty) return '아직 없어요';
   final others = libraries.length > 1 ? ' 외 ${libraries.length - 1}곳' : '';
-  return '${libraries.first.name}$others · ${libraries.length}/$maxLibraries';
+  return '${libraries.first.name}$others';
 }
 
-class _Header extends StatelessWidget {
-  const _Header(this.text);
+class _Section extends StatelessWidget {
+  const _Section({
+    required this.children,
+    this.color = AppColors.surface,
+    this.spacing = 10,
+    this.padding = const EdgeInsets.all(20),
+  });
 
-  final String text;
+  final List<Widget> children;
+  final Color color;
+  final double spacing;
+  final EdgeInsets padding;
 
   @override
-  Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
-    child: Text(text, style: Theme.of(context).textTheme.titleSmall),
+  Widget build(BuildContext context) => Container(
+    padding: padding,
+    decoration: BoxDecoration(
+      color: color,
+      borderRadius: BorderRadius.circular(24),
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      spacing: spacing,
+      children: children,
+    ),
   );
 }
 
-/// 확인을 누르면 앞뒤 공백을 지운 값을 돌려준다.
+class _ProfileRow extends StatelessWidget {
+  const _ProfileRow({
+    required this.label,
+    required this.value,
+    required this.onTap,
+  });
+
+  final String label;
+  final String value;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) => InkWell(
+    onTap: onTap,
+    child: SizedBox(
+      height: 52,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Row(
+          spacing: 4,
+          children: [
+            Expanded(
+              child: Text(
+                label,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            Text(
+              value,
+              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+            ),
+            const Icon(Icons.chevron_right, size: 18),
+          ],
+        ),
+      ),
+    ),
+  );
+}
+
 class _TextDialog extends StatefulWidget {
   const _TextDialog({
     required this.title,

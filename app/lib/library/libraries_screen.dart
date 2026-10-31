@@ -7,6 +7,8 @@ import '../api/api_error.dart';
 import '../api/models.dart';
 import '../api/providers.dart';
 import '../book/book_providers.dart';
+import '../theme/app_theme.dart';
+import '../widgets/page_heading.dart';
 import 'library_providers.dart';
 
 class LibrariesScreen extends ConsumerStatefulWidget {
@@ -86,94 +88,129 @@ class _LibrariesScreenState extends ConsumerState<LibrariesScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('내 도서관'),
+        automaticallyImplyLeading: false,
+        leading: backButton(context),
         actions: [
-          TextButton(
+          FilledButton(
             onPressed: _selected == null || _saving ? null : _save,
+            style: FilledButton.styleFrom(
+              minimumSize: const Size(0, 44),
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              textStyle: const TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
             child: const Text('저장'),
           ),
+          const SizedBox(width: 16),
         ],
       ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-            child: Text(
-              '내 도서관 ${selected.length}/$maxLibraries',
-              style: Theme.of(context).textTheme.titleMedium,
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            PageHeading(
+              title: '내 도서관',
+              subtitle: '$maxLibraries곳까지',
+              trailing: BigNumber(
+                '${selected.length}',
+                unit: '/$maxLibraries',
+                unitStyle: const TextStyle(
+                  fontSize: 28,
+                  color: AppColors.muted,
+                ),
+              ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Wrap(
+            if (selected.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(8, 0, 8, 4),
+                child: Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    for (final library in selected)
+                      _SelectedChip(
+                        library: library,
+                        onRemove: () => _toggle(library),
+                      ),
+                  ],
+                ),
+              ),
+            if (unsaved)
+              const Padding(
+                padding: EdgeInsets.fromLTRB(16, 4, 16, 0),
+                child: Text(
+                  '저장은 하루 3번까지예요. 다 고른 뒤에 저장해 주세요.',
+                  style: TextStyle(fontSize: 12, color: AppColors.bodyMuted),
+                ),
+              ),
+            const SizedBox(height: 12),
+            Row(
               spacing: 8,
               children: [
-                for (final library in selected)
-                  InputChip(
-                    label: Text(library.name),
-                    deleteButtonTooltipMessage: '빼기',
-                    deleteIcon: Icon(
-                      Icons.close,
-                      key: Key('remove-${library.libCode}'),
-                    ),
-                    onDeleted: () => _toggle(library),
-                  ),
-              ],
-            ),
-          ),
-          if (unsaved)
-            const Padding(
-              padding: EdgeInsets.fromLTRB(16, 4, 16, 0),
-              child: Text('저장은 하루 3번까지예요. 다 고른 뒤에 저장해 주세요.'),
-            ),
-          const SizedBox(height: 12),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              children: [
                 regions.when(
-                  loading: () => const SizedBox(
-                    width: 24,
-                    height: 24,
-                    child: CircularProgressIndicator(strokeWidth: 2),
+                  loading: () => const _RegionPill(
+                    value: SizedBox.square(
+                      dimension: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
                   ),
-                  error: (_, _) => const Text('지역을 불러오지 못했어요'),
-                  data: (list) => SizedBox(
-                    width: 120,
-                    child: DropdownButtonFormField<int>(
-                      key: const Key('region'),
-                      initialValue: _region,
-                      decoration: const InputDecoration(
-                        labelText: '지역',
-                        isDense: true,
+                  error: (_, _) => const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 8),
+                    child: Text('지역을 불러오지 못했어요'),
+                  ),
+                  data: (list) => PopupMenuButton<int>(
+                    key: const Key('region'),
+                    tooltip: '지역 고르기',
+                    initialValue: _region,
+                    onSelected: (value) => setState(() => _region = value),
+                    itemBuilder: (_) => [
+                      for (final region in list)
+                        PopupMenuItem(
+                          value: region.code,
+                          child: Text(region.label),
+                        ),
+                    ],
+                    child: _RegionPill(
+                      value: Text(
+                        list
+                                .where((region) => region.code == _region)
+                                .firstOrNull
+                                ?.label ??
+                            '고르기',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          color: _region == null
+                              ? AppColors.muted
+                              : AppColors.ink,
+                        ),
                       ),
-                      items: [
-                        for (final region in list)
-                          DropdownMenuItem(
-                            value: region.code,
-                            child: Text(region.label),
-                          ),
-                      ],
-                      onChanged: (value) => setState(() => _region = value),
                     ),
                   ),
                 ),
-                const SizedBox(width: 12),
                 Expanded(
                   child: TextField(
                     key: const Key('library-query'),
                     textInputAction: TextInputAction.search,
-                    decoration: const InputDecoration(hintText: '이름이나 주소'),
+                    style: const TextStyle(fontSize: 15),
+                    decoration: const InputDecoration(
+                      hintText: '이름이나 주소',
+                      prefixIcon: Icon(Icons.search, size: 20),
+                      contentPadding: EdgeInsets.symmetric(vertical: 16),
+                    ),
                     onSubmitted: (value) =>
                         setState(() => _query = value.trim()),
                   ),
                 ),
               ],
             ),
-          ),
-          Expanded(child: _results(selected)),
-        ],
+            const SizedBox(height: 8),
+            Expanded(child: _results(selected)),
+          ],
+        ),
       ),
     );
   }
@@ -190,24 +227,182 @@ class _LibrariesScreenState extends ConsumerState<LibrariesScreen> {
           data: (list) => list.isEmpty
               ? const Center(child: Text('찾는 도서관이 없어요'))
               : ListView(
+                  padding: const EdgeInsets.only(bottom: 32),
                   children: [
-                    for (final library in list)
-                      ListTile(
-                        title: Text(library.name),
-                        subtitle: library.address == null
-                            ? null
-                            : Text(library.address!),
-                        trailing: Icon(
-                          selected.any(
-                                (item) => item.libCode == library.libCode,
-                              )
-                              ? Icons.check_circle
-                              : Icons.radio_button_unchecked,
+                    Card(
+                      key: const Key('library-results'),
+                      clipBehavior: Clip.antiAlias,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 6),
+                        child: Column(
+                          children: [
+                            for (final library in list)
+                              _LibraryRow(
+                                library: library,
+                                checked: selected.any(
+                                  (item) => item.libCode == library.libCode,
+                                ),
+                                onTap: () => _toggle(library),
+                              ),
+                          ],
                         ),
-                        onTap: () => _toggle(library),
                       ),
+                    ),
                   ],
                 ),
         );
   }
+}
+
+class _SelectedChip extends StatelessWidget {
+  const _SelectedChip({required this.library, required this.onRemove});
+
+  final Library library;
+  final VoidCallback onRemove;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    height: 44,
+    padding: const EdgeInsets.only(left: 18, right: 6),
+    decoration: const ShapeDecoration(
+      color: AppColors.ink,
+      shape: StadiumBorder(),
+    ),
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      spacing: 6,
+      children: [
+        Text(
+          library.name,
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w700,
+            color: AppColors.surface,
+          ),
+        ),
+        Semantics(
+          button: true,
+          label: '${library.name} 빼기',
+          excludeSemantics: true,
+          child: Material(
+            key: Key('remove-${library.libCode}'),
+            color: const Color(0xFF3A3A38),
+            shape: const CircleBorder(),
+            clipBehavior: Clip.antiAlias,
+            child: InkWell(
+              onTap: onRemove,
+              child: const SizedBox.square(
+                dimension: 32,
+                child: Icon(Icons.close, size: 14, color: AppColors.surface),
+              ),
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+class _RegionPill extends StatelessWidget {
+  const _RegionPill({required this.value});
+
+  final Widget value;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    height: 52,
+    padding: const EdgeInsets.only(left: 18, right: 14),
+    decoration: const ShapeDecoration(
+      color: AppColors.surface,
+      shape: StadiumBorder(),
+    ),
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      spacing: 8,
+      children: [
+        const Text(
+          '지역',
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
+            color: AppColors.bodyMuted,
+          ),
+        ),
+        value,
+        const Icon(Icons.keyboard_arrow_down, size: 20),
+      ],
+    ),
+  );
+}
+
+class _LibraryRow extends StatelessWidget {
+  const _LibraryRow({
+    required this.library,
+    required this.checked,
+    required this.onTap,
+  });
+
+  final Library library;
+  final bool checked;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+    checked: checked,
+    child: InkWell(
+      onTap: onTap,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(minHeight: 68),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          child: Row(
+            spacing: 14,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  spacing: 2,
+                  children: [
+                    Text(
+                      library.name,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    if (library.address != null)
+                      Text(
+                        library.address!,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: AppColors.bodyMuted,
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+              Container(
+                width: 28,
+                height: 28,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: checked ? AppColors.ink : null,
+                  border: checked
+                      ? null
+                      : Border.all(color: const Color(0xFFB5B5B0), width: 2),
+                ),
+                child: checked
+                    ? const Icon(
+                        Icons.check,
+                        size: 16,
+                        color: AppColors.surface,
+                      )
+                    : null,
+              ),
+            ],
+          ),
+        ),
+      ),
+    ),
+  );
 }

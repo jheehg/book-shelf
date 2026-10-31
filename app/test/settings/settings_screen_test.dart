@@ -20,6 +20,8 @@ void main() {
 
   Future<void> tapText(WidgetTester tester, String text) async {
     await tester.scrollUntilVisible(find.text(text), 200);
+    await tester.ensureVisible(find.text(text));
+    await tester.pumpAndSettle();
     await tester.tap(find.text(text));
     await tester.pumpAndSettle();
   }
@@ -32,10 +34,12 @@ void main() {
   testWidgets('이름, 서재 주소, 링크, 내 도서관을 보여준다', (tester) async {
     await pumpApp(tester, api, initialLocation: '/settings');
 
-    expect(find.text('나'), findsOneWidget);
+    expect(find.text('나'), findsWidgets);
+    expect(find.text('@mine'), findsOneWidget);
     expect(find.text('mine'), findsOneWidget);
-    expect(find.text('http://localhost:8080/u/mine'), findsOneWidget);
-    await tester.scrollUntilVisible(find.text('송파도서관 외 1곳 · 2/3'), 200);
+    expect(find.text('localhost:8080/u/mine'), findsOneWidget);
+    await tester.scrollUntilVisible(find.text('송파도서관 외 1곳'), 200);
+    expect(find.text('2/3'), findsOneWidget);
   });
 
   testWidgets('내 도서관이 없으면 아직 없다고 보여준다', (tester) async {
@@ -43,6 +47,15 @@ void main() {
     await pumpApp(tester, api, initialLocation: '/settings');
 
     await tester.scrollUntilVisible(find.text('아직 없어요'), 200);
+    expect(find.text('0/3'), findsOneWidget);
+  });
+
+  testWidgets('내 도서관 카드를 누르면 내 도서관 화면으로 간다', (tester) async {
+    await pumpApp(tester, api, initialLocation: '/settings');
+
+    await tapText(tester, '송파도서관 외 1곳');
+
+    expect(find.text('3곳까지'), findsOneWidget);
   });
 
   testWidgets('이름을 고치면 서버에 저장하고 새 이름을 보여준다', (tester) async {
@@ -53,7 +66,8 @@ void main() {
     await tapButton(tester, '저장');
 
     expect(api.calls, contains('updateMe::책벌레:'));
-    expect(find.text('책벌레'), findsOneWidget);
+    expect(find.text('책벌레'), findsWidgets);
+    expect(find.text('나'), findsNothing);
   });
 
   testWidgets('규칙에 맞지 않는 서재 주소는 서버에 보내지 않는다', (tester) async {
@@ -146,13 +160,7 @@ void main() {
     await pumpApp(tester, api, initialLocation: '/settings');
     expect(find.text(RecordVisibility.private.description), findsOneWidget);
 
-    await tester.tap(
-      find.descendant(
-        of: find.byType(SegmentedButton<RecordVisibility>),
-        matching: find.text('별점만'),
-      ),
-    );
-    await tester.pumpAndSettle();
+    await tapText(tester, '별점만');
 
     expect(api.calls, contains('updateMe:::RATING_ONLY'));
     expect(find.text(RecordVisibility.ratingOnly.description), findsOneWidget);
@@ -165,7 +173,7 @@ void main() {
     await tapText(tester, '로그아웃');
     expect(find.text('로그아웃할까요?'), findsOneWidget);
     await tapButton(tester, '취소');
-    expect(find.text('설정'), findsOneWidget);
+    expect(find.text('계정 삭제'), findsOneWidget);
     expect(api.calls, isNot(contains('logout')));
 
     await tapText(tester, '로그아웃');
@@ -202,6 +210,6 @@ void main() {
     await tapButton(tester, '지우기');
 
     expect(find.text('서버에 연결할 수 없어요'), findsOneWidget);
-    expect(find.text('설정'), findsOneWidget);
+    expect(find.text('계정 삭제'), findsOneWidget);
   });
 }

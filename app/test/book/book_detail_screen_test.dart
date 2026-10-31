@@ -280,10 +280,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(inSection('빌리기', find.text('도서관 등록')));
     await tester.pumpAndSettle();
-    expect(
-      find.descendant(of: find.byType(AppBar), matching: find.text('내 도서관')),
-      findsOneWidget,
-    );
+    expect(find.text('3곳까지'), findsOneWidget);
   });
 
   testWidgets('이미 담긴 책이면 오류 없이 내 기록으로 바뀐다', (tester) async {

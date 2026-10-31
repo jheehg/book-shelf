@@ -270,7 +270,8 @@ void main() {
     await pumpApp(tester, FakeApi());
     await tester.tap(find.byTooltip('내 도서관'));
     await tester.pumpAndSettle();
-    expect(find.text('내 도서관 0/3'), findsOneWidget);
+    expect(find.text('3곳까지'), findsOneWidget);
+    expect(find.text('0/3'), findsOneWidget);
   });
 
   testWidgets('바코드로 담기 버튼은 바코드 화면을 연다', (tester) async {

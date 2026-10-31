@@ -9,6 +9,7 @@ import '../book/book_providers.dart';
 import '../theme/app_theme.dart';
 import '../theme/reading_status_style.dart';
 import '../widgets/cover.dart';
+import '../widgets/visibility_picker.dart';
 import 'finish_date_sheet.dart';
 import 'records_provider.dart';
 import 'review_length.dart';
@@ -400,7 +401,7 @@ class _RecordEditScreenState extends ConsumerState<RecordEditScreen> {
             spacing: 12,
             children: [
               const Text('공개 범위', style: _label),
-              _VisibilityPicker(
+              VisibilityPicker(
                 selected: _visibility,
                 onChanged: (visibility) =>
                     setState(() => _visibility = visibility),
@@ -577,53 +578,6 @@ class _StatusTile extends StatelessWidget {
           ),
         ),
       ),
-    ),
-  );
-}
-
-class _VisibilityPicker extends StatelessWidget {
-  const _VisibilityPicker({required this.selected, required this.onChanged});
-
-  final RecordVisibility selected;
-  final ValueChanged<RecordVisibility> onChanged;
-
-  @override
-  Widget build(BuildContext context) => Container(
-    padding: const EdgeInsets.all(4),
-    decoration: const ShapeDecoration(
-      color: AppColors.ground,
-      shape: StadiumBorder(),
-    ),
-    child: Row(
-      spacing: 6,
-      children: [
-        for (final visibility in RecordVisibility.values)
-          Expanded(
-            child: MergeSemantics(
-              child: Semantics(
-                inMutuallyExclusiveGroup: true,
-                checked: visibility == selected,
-                child: TextButton(
-                  onPressed: () => onChanged(visibility),
-                  style: TextButton.styleFrom(
-                    minimumSize: const Size.fromHeight(44),
-                    backgroundColor: visibility == selected
-                        ? AppColors.ink
-                        : Colors.transparent,
-                    foregroundColor: visibility == selected
-                        ? AppColors.surface
-                        : AppColors.ink,
-                    textStyle: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  child: Text(visibility.label),
-                ),
-              ),
-            ),
-          ),
-      ],
     ),
   );
 }

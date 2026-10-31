@@ -21,6 +21,11 @@ void main() {
       ..onLibraries = (region, q) async => region == 11 ? seoul : const [];
   });
 
+  Finder result(String name) => find.descendant(
+    of: find.byKey(const Key('library-results')),
+    matching: find.text(name),
+  );
+
   Future<void> chooseSeoul(WidgetTester tester) async {
     await tester.tap(find.byKey(const Key('region')));
     await tester.pumpAndSettle();
@@ -33,24 +38,24 @@ void main() {
     await chooseSeoul(tester);
 
     for (final name in ['송파도서관', '강동도서관', '가락몰도서관']) {
-      await tester.tap(find.widgetWithText(ListTile, name));
+      await tester.tap(result(name));
       await tester.pumpAndSettle();
     }
-    expect(find.text('내 도서관 3/3'), findsOneWidget);
+    expect(find.text('3/3'), findsOneWidget);
 
-    await tester.tap(find.widgetWithText(ListTile, '노원도서관'));
+    await tester.tap(result('노원도서관'));
     await tester.pumpAndSettle();
 
     expect(find.text('도서관은 3곳까지 등록할 수 있어요'), findsOneWidget);
-    expect(find.text('내 도서관 3/3'), findsOneWidget);
+    expect(find.text('3/3'), findsOneWidget);
     expect(api.calls.where((c) => c.startsWith('setMyLibraries')), isEmpty);
   });
 
   testWidgets('저장을 누를 때 고른 순서대로 한 번 보낸다', (tester) async {
     await pumpApp(tester, api, initialLocation: '/libraries');
     await chooseSeoul(tester);
-    await tester.tap(find.widgetWithText(ListTile, '강동도서관'));
-    await tester.tap(find.widgetWithText(ListTile, '송파도서관'));
+    await tester.tap(result('강동도서관'));
+    await tester.tap(result('송파도서관'));
     await tester.pumpAndSettle();
 
     await tester.tap(find.text('저장'));
@@ -65,7 +70,7 @@ void main() {
     api.myLibraryList = [seoul[0]];
     await pumpApp(tester, api, initialLocation: '/libraries');
 
-    expect(find.text('내 도서관 1/3'), findsOneWidget);
+    expect(find.text('1/3'), findsOneWidget);
     await tester.tap(find.byKey(const Key('remove-L1')));
     await tester.pumpAndSettle();
     await tester.tap(find.text('저장'));
@@ -82,14 +87,14 @@ void main() {
     );
     await pumpApp(tester, api, initialLocation: '/libraries');
     await chooseSeoul(tester);
-    await tester.tap(find.widgetWithText(ListTile, '송파도서관'));
+    await tester.tap(result('송파도서관'));
     await tester.pumpAndSettle();
 
     await tester.tap(find.text('저장'));
     await tester.pumpAndSettle();
 
     expect(find.textContaining('하루 3번까지'), findsWidgets);
-    expect(find.text('내 도서관 1/3'), findsOneWidget);
+    expect(find.text('1/3'), findsOneWidget);
   });
 
   testWidgets('저장 횟수 안내는 바꾼 내용이 있을 때만 보여준다', (tester) async {
@@ -99,30 +104,49 @@ void main() {
     expect(find.text(limitHint), findsNothing);
 
     await chooseSeoul(tester);
-    await tester.tap(find.widgetWithText(ListTile, '강동도서관'));
+    await tester.tap(result('강동도서관'));
     await tester.pumpAndSettle();
     expect(find.text(limitHint), findsOneWidget);
 
-    await tester.tap(find.widgetWithText(ListTile, '강동도서관'));
+    await tester.tap(result('강동도서관'));
     await tester.pumpAndSettle();
     expect(find.text(limitHint), findsNothing);
   });
 
-  testWidgets('지역 선택은 테두리와 이름표가 있는 첫 단계로 보인다', (tester) async {
+  testWidgets('지역을 고르기 전에는 지역부터 고르라고 안내하고, 고르면 그 지역 이름을 보여준다', (tester) async {
     await pumpApp(tester, api, initialLocation: '/libraries');
-
+    final region = find.byKey(const Key('region'));
+    expect(find.text('지역을 먼저 골라 주세요'), findsOneWidget);
     expect(
-      find.descendant(
-        of: find.byKey(const Key('region')),
-        matching: find.byWidgetPredicate(
-          (widget) =>
-              widget is InputDecorator &&
-              widget.decoration.labelText == '지역' &&
-              widget.decoration.border is OutlineInputBorder,
-        ),
-      ),
+      find.descendant(of: region, matching: find.text('서울')),
+      findsNothing,
+    );
+
+    await chooseSeoul(tester);
+
+    expect(find.text('지역을 먼저 골라 주세요'), findsNothing);
+    expect(
+      find.descendant(of: region, matching: find.text('서울')),
       findsOneWidget,
     );
+  });
+
+  testWidgets('고른 도서관에는 이름이 붙은 빼기 버튼이 있고 목록에는 고른 표시가 붙는다', (tester) async {
+    final semantics = tester.ensureSemantics();
+    api.myLibraryList = [seoul[0]];
+    await pumpApp(tester, api, initialLocation: '/libraries');
+    await chooseSeoul(tester);
+
+    expect(find.bySemanticsLabel('송파도서관 빼기'), findsOneWidget);
+    expect(
+      tester.getSemantics(result('송파도서관')),
+      isSemantics(isChecked: true, hasCheckedState: true),
+    );
+    expect(
+      tester.getSemantics(result('강동도서관')),
+      isSemantics(isChecked: false, hasCheckedState: true),
+    );
+    semantics.dispose();
   });
 
   testWidgets('이름으로 좁혀 찾는다', (tester) async {

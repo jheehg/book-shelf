@@ -56,7 +56,7 @@ void main() {
     await openCalendar(tester, api);
 
     expect(find.text('2026년 10월'), findsOneWidget);
-    expect(find.text('이번 달 2권'), findsOneWidget);
+    expect(find.bySemanticsLabel('이번 달 2권'), findsOneWidget);
     expect(find.bySemanticsLabel('10월 12일, 소년이 온다 외 1권 다 읽음'), findsOneWidget);
     expect(find.text('+1'), findsOneWidget);
   });
@@ -71,13 +71,44 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('2026년 9월'), findsOneWidget);
-    expect(find.text('이번 달 1권'), findsOneWidget);
+    expect(find.bySemanticsLabel('이번 달 1권'), findsOneWidget);
     expect(find.bySemanticsLabel('9월 3일, 작별하지 않는다 다 읽음'), findsOneWidget);
     expect(tester.widget<IconButton>(next).onPressed, isNotNull);
 
     await tester.tap(find.byTooltip('다음 달'));
     await tester.pumpAndSettle();
     expect(find.text('2026년 10월'), findsOneWidget);
+  });
+
+  testWidgets('달 이름을 눌러 그 달로 가고, 오지 않은 달은 누를 수 없다', (tester) async {
+    await openCalendar(tester, api);
+
+    await tester.tap(find.text('11월'), warnIfMissed: false);
+    await tester.pumpAndSettle();
+    expect(find.text('2026년 10월'), findsOneWidget);
+
+    final march = find.widgetWithText(InkWell, '3월');
+    await tester.ensureVisible(march);
+    await tester.pumpAndSettle();
+    await tester.tap(march);
+    await tester.pumpAndSettle();
+
+    expect(find.text('2026년 3월'), findsOneWidget);
+    expect(find.bySemanticsLabel('이번 달 2권'), findsOneWidget);
+    expect(find.bySemanticsLabel('3월 1일, 흰 다 읽음'), findsOneWidget);
+  });
+
+  testWidgets('지난해를 보면 그해 권수로 보여 준다', (tester) async {
+    await openCalendar(tester, api);
+
+    for (var i = 0; i < 10; i++) {
+      await tester.tap(find.byTooltip('이전 달'));
+      await tester.pumpAndSettle();
+    }
+
+    expect(find.text('2025년 12월'), findsOneWidget);
+    expect(find.bySemanticsLabel('2025년 다 읽음 1권'), findsOneWidget);
+    expect(find.bySemanticsLabel('가장 많이 읽은 달 12월'), findsOneWidget);
   });
 
   testWidgets('날짜를 누르면 그날 읽은 책 목록에서 책 화면으로 간다', (tester) async {
@@ -99,15 +130,15 @@ void main() {
   testWidgets('올해 권수와 가장 많이 읽은 달을 보여 준다', (tester) async {
     await openCalendar(tester, api);
 
-    expect(find.text('올해 다 읽음 5권'), findsOneWidget);
-    expect(find.text('가장 많이 읽은 달 3월'), findsOneWidget);
+    expect(find.bySemanticsLabel('올해 다 읽음 5권'), findsOneWidget);
+    expect(find.bySemanticsLabel('가장 많이 읽은 달 3월'), findsOneWidget);
   });
 
   testWidgets('다 읽은 책이 없는 해에는 가장 많이 읽은 달을 숨긴다', (tester) async {
     api.recordsBySlug['mine'] = [];
     await openCalendar(tester, api);
 
-    expect(find.text('올해 다 읽음 0권'), findsOneWidget);
+    expect(find.bySemanticsLabel('올해 다 읽음 0권'), findsOneWidget);
     expect(find.textContaining('가장 많이 읽은 달'), findsNothing);
   });
 
