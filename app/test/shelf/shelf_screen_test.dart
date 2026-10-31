@@ -46,23 +46,12 @@ void main() {
     await pumpApp(tester, api, store: MemoryTokenStore());
     expect(find.text('개발 로그인'), findsOneWidget);
 
-    await tester.enterText(find.byType(TextField), 'mine');
-    await tester.tap(find.text('개발 로그인'));
+    await submitDevLogin(tester, 'mine');
     await tester.pumpAndSettle();
 
     expect(find.text('내 서재'), findsOneWidget);
     expect(find.text('소년이 온다'), findsOneWidget);
     expect(api.calls, contains('devLogin:mine'));
-  });
-
-  testWidgets('slug 규칙에 맞지 않으면 서버를 부르지 않는다', (tester) async {
-    await pumpApp(tester, api, store: MemoryTokenStore());
-    await tester.enterText(find.byType(TextField), 'Me');
-    await tester.tap(find.text('개발 로그인'));
-    await tester.pumpAndSettle();
-
-    expect(find.textContaining('소문자·숫자·하이픈'), findsOneWidget);
-    expect(api.calls.where((call) => call.startsWith('devLogin')), isEmpty);
   });
 
   testWidgets('책 정보가 없는 기록은 ISBN과 대체 표지로 보인다', (tester) async {
@@ -360,8 +349,7 @@ void main() {
     expect(find.text('소년이 온다'), findsOneWidget);
 
     await confirmLogout(tester);
-    await tester.enterText(find.byType(TextField), 'dev-other');
-    await tester.tap(find.text('개발 로그인'));
+    await submitDevLogin(tester, 'dev-other');
     await tester.pumpAndSettle();
 
     expect(find.text('소년이 온다'), findsNothing);

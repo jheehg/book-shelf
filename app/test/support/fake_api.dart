@@ -9,6 +9,7 @@ class FakeApi implements BookShelfApi {
   Map<String, List<RecordItem>> recordsBySlug = {};
   Future<List<RecordItem>> Function()? onRecords;
   Future<void> Function()? onLogout;
+  Future<void> Function(String slug)? onDevLogin;
   Future<BookDetail> Function(String isbn)? onBook;
   Future<StoreLinks> Function(String isbn)? onLinks;
   Future<List<Holding>> Function(String isbn)? onHoldings;
@@ -42,6 +43,7 @@ class FakeApi implements BookShelfApi {
   @override
   Future<AuthTokens> devLogin(String slug) async {
     calls.add('devLogin:$slug');
+    await onDevLogin?.call(slug);
     loggedInSlug = slug;
     return AuthTokens(
       accessToken: 'a-$slug',
