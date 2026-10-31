@@ -146,10 +146,46 @@ void main() {
     await pumpApp(tester, FakeApi());
     expect(find.text('아직 기록이 없어요.'), findsOneWidget);
     expect(find.text('책 뒷면 바코드를 찍어 첫 책을 담아 보세요.'), findsOneWidget);
+    expect(find.widgetWithText(FilledButton, '바코드 찍기'), findsNothing);
+    expect(find.byIcon(Icons.qr_code_scanner), findsOneWidget);
+  });
 
-    await tester.tap(find.widgetWithText(FilledButton, '바코드 찍기'));
+  testWidgets('바코드로 담기 버튼은 바코드 화면을 연다', (tester) async {
+    await pumpApp(tester, api);
+    expect(find.byIcon(Icons.qr_code_scanner), findsOneWidget);
+
+    await tester.tap(find.text('바코드로 담기'));
     await tester.pumpAndSettle();
     expect(find.byType(ScanScreen), findsOneWidget);
+    expect(find.text('바코드 찍기'), findsOneWidget);
+  });
+
+  testWidgets('끝까지 내리면 마지막 기록이 바코드 버튼에 가리지 않는다', (tester) async {
+    api.recordsBySlug['mine'] = [
+      for (var i = 0; i < 15; i++)
+        record(
+          i + 1,
+          '97889364341${i.toString().padLeft(2, '0')}',
+          ReadingStatus.done,
+          title: '책 ${i + 1}',
+        ),
+    ];
+    tester.view.physicalSize = const Size(1179, 2556);
+    tester.view.devicePixelRatio = 3;
+    addTearDown(tester.view.reset);
+    await pumpApp(tester, api);
+
+    await tester.dragUntilVisible(
+      find.text('책 15'),
+      find.byType(ListView),
+      const Offset(0, -300),
+    );
+    await tester.drag(find.byType(ListView), const Offset(0, -2000));
+    await tester.pumpAndSettle();
+
+    final lastRow = tester.getRect(find.widgetWithText(ListTile, '책 15'));
+    final fab = tester.getRect(find.byType(FloatingActionButton));
+    expect(lastRow.overlaps(fab), isFalse);
   });
 
   testWidgets('로그아웃은 확인을 받은 뒤에만 한다', (tester) async {

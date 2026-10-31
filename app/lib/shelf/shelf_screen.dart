@@ -51,11 +51,6 @@ class _ShelfScreenState extends ConsumerState<ShelfScreen> {
             onPressed: () => context.push('/search'),
           ),
           IconButton(
-            tooltip: '바코드 찍기',
-            icon: const Icon(Icons.qr_code_scanner),
-            onPressed: () => context.push('/scan'),
-          ),
-          IconButton(
             tooltip: '내 도서관',
             icon: const Icon(Icons.local_library_outlined),
             onPressed: () => context.push('/libraries'),
@@ -67,6 +62,11 @@ class _ShelfScreenState extends ConsumerState<ShelfScreen> {
             onPressed: _confirmLogout,
           ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => context.push('/scan'),
+        icon: const Icon(Icons.qr_code_scanner),
+        label: const Text('바코드로 담기'),
       ),
       body: Column(
         children: [
@@ -119,6 +119,10 @@ class _ShelfScreenState extends ConsumerState<ShelfScreen> {
                   onRefresh: () => ref.refresh(recordsProvider.future),
                   child: ListView.builder(
                     physics: const AlwaysScrollableScrollPhysics(),
+                    // FAB 높이 56과 여백 16에 틈을 더해 마지막 줄이 가리지 않게 한다.
+                    padding: EdgeInsets.only(
+                      bottom: 88 + MediaQuery.paddingOf(context).bottom,
+                    ),
                     itemCount: shown.isEmpty ? 1 : shown.length,
                     itemBuilder: (_, i) => shown.isEmpty
                         ? Padding(
@@ -143,16 +147,11 @@ class _FirstBookGuide extends StatelessWidget {
   const _FirstBookGuide();
 
   @override
-  Widget build(BuildContext context) => Column(
+  Widget build(BuildContext context) => const Column(
     children: [
-      const Text('아직 기록이 없어요.'),
-      const SizedBox(height: 4),
-      const Text('책 뒷면 바코드를 찍어 첫 책을 담아 보세요.'),
-      const SizedBox(height: 16),
-      FilledButton(
-        onPressed: () => context.push('/scan'),
-        child: const Text('바코드 찍기'),
-      ),
+      Text('아직 기록이 없어요.'),
+      SizedBox(height: 4),
+      Text('책 뒷면 바코드를 찍어 첫 책을 담아 보세요.'),
     ],
   );
 }
