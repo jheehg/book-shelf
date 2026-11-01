@@ -91,6 +91,7 @@ class _LibrariesScreenState extends ConsumerState<LibrariesScreen> {
         automaticallyImplyLeading: false,
         leading: backButton(context),
         actions: [
+          ?homeButton(context),
           FilledButton(
             onPressed: _selected == null || _saving ? null : _save,
             style: FilledButton.styleFrom(

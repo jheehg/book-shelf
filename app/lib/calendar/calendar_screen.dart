@@ -601,7 +601,7 @@ class _DayCell extends StatelessWidget {
                     : Text(record.book!.author!),
                 onTap: () {
                   Navigator.pop(sheetContext);
-                  context.push('/book/${record.isbn13}');
+                  context.push('/record/${record.id}');
                 },
               ),
           ],

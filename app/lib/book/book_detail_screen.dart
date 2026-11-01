@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../theme/app_theme.dart';
+import '../widgets/page_heading.dart';
 import 'book_providers.dart';
 import 'sections/borrow_section.dart';
 import 'sections/buy_sections.dart';
@@ -25,6 +26,7 @@ class BookDetailScreen extends ConsumerWidget {
               icon: const Icon(Icons.chevron_left, size: 32),
             )
           : null,
+      actions: [?homeButton(context), const SizedBox(width: 8)],
     ),
     body: Stack(
       children: [

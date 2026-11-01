@@ -83,3 +83,20 @@ Widget? backButton(BuildContext context) => context.canPop()
         icon: const Icon(Icons.chevron_left, size: 32),
       )
     : null;
+
+/// 뒤로 가기 한 번으로 내 서재에 닿지 않을 때만 보이는 버튼. AppBar.actions에 넣는다.
+/// 지금 맨 위 화면이 아니라 이 화면 자신의 위치로 판단해야, 가려진 채 다시 그려져도 맞다.
+Widget? homeButton(BuildContext context) {
+  final pageKey = GoRouterState.of(context).pageKey;
+  final position = GoRouter.of(context)
+      .routerDelegate
+      .currentConfiguration
+      .matches
+      .indexWhere((match) => match.pageKey == pageKey);
+  if (position == 1) return null;
+  return IconButton(
+    tooltip: '내 서재',
+    onPressed: () => context.go('/'),
+    icon: const Icon(Icons.home_outlined, size: 26),
+  );
+}

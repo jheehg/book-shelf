@@ -111,7 +111,7 @@ void main() {
     expect(find.bySemanticsLabel('가장 많이 읽은 달 12월'), findsOneWidget);
   });
 
-  testWidgets('날짜를 누르면 그날 읽은 책 목록에서 책 화면으로 간다', (tester) async {
+  testWidgets('날짜를 누르면 그날 읽은 책 목록에서 내 기록 화면으로 간다', (tester) async {
     await openCalendar(tester, api);
 
     await tester.tap(find.bySemanticsLabel('10월 12일, 소년이 온다 외 1권 다 읽음'));
@@ -123,7 +123,7 @@ void main() {
     await tester.tap(find.text('소년이 온다'));
     await tester.pumpAndSettle();
 
-    expect(api.calls, contains('book:9788936434120'));
+    expect(find.byTooltip('기록 삭제'), findsOneWidget);
     expect(find.text('완독 달력'), findsNothing);
   });
 

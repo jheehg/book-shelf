@@ -9,6 +9,7 @@ import '../book/book_providers.dart';
 import '../theme/app_theme.dart';
 import '../theme/reading_status_style.dart';
 import '../widgets/cover.dart';
+import '../widgets/page_heading.dart';
 import '../widgets/visibility_picker.dart';
 import 'finish_date_sheet.dart';
 import 'records_provider.dart';
@@ -190,6 +191,7 @@ class _RecordEditScreenState extends ConsumerState<RecordEditScreen> {
               )
             : null,
         actions: [
+          ?homeButton(context),
           IconButton(
             key: const Key('delete'),
             tooltip: '기록 삭제',
