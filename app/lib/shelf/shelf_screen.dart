@@ -241,8 +241,10 @@ class _RecordCard extends StatelessWidget {
               top: 0,
               bottom: -_cardOverlap,
               child: DecoratedBox(
+                // 같은 상태가 이어지면 색이 한 덩어리가 되므로 바탕색 테두리로 겹친 자리에 틈을 낸다.
                 decoration: BoxDecoration(
                   color: status.color,
+                  border: Border.all(color: AppColors.ground, width: 2),
                   borderRadius: BorderRadius.circular(22),
                 ),
               ),
