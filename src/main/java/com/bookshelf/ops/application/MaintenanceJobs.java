@@ -5,7 +5,9 @@ import com.bookshelf.library.application.LibrarySync;
 import com.bookshelf.search.infrastructure.persistence.SearchCacheCleanup;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 
@@ -39,6 +41,12 @@ class MaintenanceJobs {
     /** 매일 돌지만 마지막 완료가 7일 넘었을 때만 정보나루를 부른다(LibrarySync) */
     @Scheduled(cron = "${bookshelf.background.library-sync-cron}", zone = "Asia/Seoul")
     void librarySync() {
+        librarySync.runOnce();
+    }
+
+    /** 새벽 스케줄만 있으면 처음 띄운 서버는 다음 05:00까지 도서관 목록이 비어 검색이 안 된다 */
+    @EventListener(ApplicationReadyEvent.class)
+    void librarySyncOnStartup() {
         librarySync.runOnce();
     }
 }

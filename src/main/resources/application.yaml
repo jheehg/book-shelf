@@ -92,7 +92,7 @@ bookshelf:
     backfill-interval: PT10M
     backfill-batch-size: 20
     cleanup-cron: "0 30 4 * * *"   # 매일 04:30 KST — 사용자가 가장 적은 시간
-    library-sync-cron: "0 0 5 * * *"   # 매일 05:00 KST. 첫 배포 다음 날 새벽에 처음 채워진다
+    library-sync-cron: "0 0 5 * * *"   # 매일 05:00 KST. 비어 있으면 기동 직후에도 채운다(MaintenanceJobs)
 
 # 서점 검색 링크 (설계 문서 2-1). 형식이 바뀌면 여기만 고친다.
 # 확인 방법: {isbn}=9788936434120, {title}=소년이 온다, {author}=한강 으로 열어 그 책이 보이는가
